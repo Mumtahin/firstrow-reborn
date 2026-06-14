@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getMosqueBySlug } from '@/lib/db/queries'
+import { auth } from '@/auth'
+import { getMosqueBySlug, getFavouriteIds } from '@/lib/db/queries'
 import { getNextJamaat } from '@/lib/utils/getNextJamaat'
+import FavouriteButton from '@/components/FavouriteButton'
 
 // Helpers
 const PRAYERS = [
@@ -84,8 +86,15 @@ export default async function MosqueDetailPage({
   const date = dateParam ?? today
   const isToday = date === today
 
-  const mosque = await getMosqueBySlug(slug, date)
+  const [mosque, session] = await Promise.all([
+    getMosqueBySlug(slug, date),
+    auth(),
+  ])
   if (!mosque) notFound()
+
+  const userId = session?.user?.id ?? null
+  const favouriteIds = userId ? await getFavouriteIds(userId) : new Set<number>()
+  const isFavourited = favouriteIds.has(mosque.id)
 
   const now = new Date()
   const nextJamaat = isToday ? getNextJamaat(mosque, now) : null
@@ -106,7 +115,10 @@ export default async function MosqueDetailPage({
       </Link>
 
       {/* Heading */}
-      <h1 className="text-2xl font-bold text-gray-900">{mosque.name}</h1>
+      <div className="flex items-start justify-between gap-3">
+        <h1 className="text-2xl font-bold text-gray-900">{mosque.name}</h1>
+        <FavouriteButton mosqueId={mosque.id} isFavourited={isFavourited} userId={userId} />
+      </div>
       {mosque.addressLine1 && (
         <p className="mt-1 text-sm text-gray-500">
           {mosque.addressLine1}{mosque.addressLine2 ? `, ${mosque.addressLine2}` : ''},{' '}

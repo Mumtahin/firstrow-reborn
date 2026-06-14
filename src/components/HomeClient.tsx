@@ -7,11 +7,12 @@ import { getNextJamaat } from '@/lib/utils/getNextJamaat'
 import type { MosqueWithTimes } from '@/lib/db/queries'
 import MosqueCard from './MosqueCard'
 
-// Map uses mapbox-gl which is browser-only — load it client-side only
 const MosqueMap = dynamic(() => import('./MosqueMap'), { ssr: false })
 
 type Props = {
   mosques: MosqueWithTimes[]
+  favouriteIds: number[]
+  userId: string | null
 }
 
 type LocationState =
@@ -20,8 +21,9 @@ type LocationState =
   | { status: 'denied' }
   | { status: 'unavailable' }
 
-export default function HomeClient({ mosques }: Props) {
+export default function HomeClient({ mosques, favouriteIds, userId }: Props) {
   const [location, setLocation] = useState<LocationState>({ status: 'pending' })
+  const favSet = new Set(favouriteIds)
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -50,7 +52,6 @@ export default function HomeClient({ mosques }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Map */}
       {location.status === 'pending' && (
         <div className="flex h-64 w-full items-center justify-center rounded-xl bg-gray-100">
           <div className="h-7 w-7 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
@@ -70,11 +71,11 @@ export default function HomeClient({ mosques }: Props) {
         </div>
       )}
 
-      {/* Mosque list */}
       <div className="flex flex-col gap-3">
         {sortedMosques.map((m) => (
           <MosqueCard
             key={m.id}
+            id={m.id}
             name={m.name}
             slug={m.slug}
             addressLine1={m.addressLine1}
@@ -82,6 +83,8 @@ export default function HomeClient({ mosques }: Props) {
             postcode={m.postcode}
             distance={m.distance}
             nextJamaat={m.nextJamaat}
+            isFavourited={favSet.has(m.id)}
+            userId={userId}
           />
         ))}
       </div>

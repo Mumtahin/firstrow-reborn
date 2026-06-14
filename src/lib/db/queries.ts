@@ -1,6 +1,6 @@
 import { and, eq } from 'drizzle-orm'
 import { db } from './index'
-import { amenities, contactInfo, location, mosque, prayerTimes } from './schema'
+import { amenities, contactInfo, favourite, location, mosque, prayerTimes } from './schema'
 
 export type MosqueWithTimes = {
   id: number
@@ -72,6 +72,49 @@ export type MosqueDetail = {
   maghribJamaat: string | null
   ishaStart: string | null
   ishaJamaat: string | null
+}
+
+/** Returns the set of mosque IDs that a user has favourited. */
+export async function getFavouriteIds(userId: string): Promise<Set<number>> {
+  const rows = await db
+    .select({ mosqueId: favourite.mosqueId })
+    .from(favourite)
+    .where(eq(favourite.userId, userId))
+
+  return new Set(rows.map((r) => r.mosqueId))
+}
+
+/** Fetches a user's favourited mosques with location and prayer times for a given date. */
+export async function getFavouritedMosques(
+  userId: string,
+  date: string
+): Promise<MosqueWithTimes[]> {
+  const rows = await db
+    .select({
+      id: mosque.id,
+      name: mosque.name,
+      slug: mosque.slug,
+      lat: location.lat,
+      lng: location.lng,
+      addressLine1: location.addressLine1,
+      town: location.town,
+      postcode: location.postcode,
+      fajrJamaat: prayerTimes.fajrJamaat,
+      zuhrJamaat: prayerTimes.zuhrJamaat,
+      asrJamaat: prayerTimes.asrJamaat,
+      maghribJamaat: prayerTimes.maghribJamaat,
+      ishaJamaat: prayerTimes.ishaJamaat,
+    })
+    .from(favourite)
+    .innerJoin(mosque, and(eq(mosque.id, favourite.mosqueId), eq(mosque.status, 'active')))
+    .innerJoin(location, eq(location.mosqueId, mosque.id))
+    .leftJoin(
+      prayerTimes,
+      and(eq(prayerTimes.mosqueId, mosque.id), eq(prayerTimes.date, date))
+    )
+    .where(eq(favourite.userId, userId))
+
+  return rows as MosqueWithTimes[]
 }
 
 /** Fetches a single active mosque with full detail and prayer times for a given date. */
