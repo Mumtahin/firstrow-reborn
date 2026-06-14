@@ -25,18 +25,12 @@ import {
 const sql = neon(process.env.DATABASE_URL!)
 const db = drizzle(sql, { schema })
 
-// ---------------------------------------------------------------------------
 // Helpers
-// ---------------------------------------------------------------------------
-
 function today() {
   return new Date().toISOString().split('T')[0] // 'YYYY-MM-DD'
 }
 
-// ---------------------------------------------------------------------------
 // Mosque data
-// ---------------------------------------------------------------------------
-
 const mosques = [
   {
     mosque: { name: 'East London Mosque', slug: 'east-london-mosque', status: 'active' as const },
@@ -242,9 +236,7 @@ const mosques = [
   },
 ]
 
-// ---------------------------------------------------------------------------
 // Seed
-// ---------------------------------------------------------------------------
 
 async function seed() {
   console.log('Clearing tables...')

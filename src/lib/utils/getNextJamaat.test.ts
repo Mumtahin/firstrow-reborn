@@ -1,13 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { getNextJamaat, parseTime } from './getNextJamaat'
 
-// ---------------------------------------------------------------------------
 // Helpers
 //
 // All tests use dates in June (BST, UTC+1) so UK time = UTC + 1 hour.
 // To get UK time 13:30, pass a Date of 2026-06-14T12:30:00Z.
-// ---------------------------------------------------------------------------
-
 function ukTime(hhmm: string): Date {
   const [hh, mm] = hhmm.split(':').map(Number)
   // Subtract 1 hour to convert BST → UTC
@@ -22,10 +19,7 @@ const TIMES = {
   ishaJamaat: '22:30',
 }
 
-// ---------------------------------------------------------------------------
 // parseTime
-// ---------------------------------------------------------------------------
-
 describe('parseTime', () => {
   it('parses midnight', () => expect(parseTime('00:00')).toBe(0))
   it('parses noon', () => expect(parseTime('12:00')).toBe(720))
@@ -33,10 +27,7 @@ describe('parseTime', () => {
   it('parses end of day', () => expect(parseTime('23:59')).toBe(1439))
 })
 
-// ---------------------------------------------------------------------------
 // getNextJamaat — normal flow through the day
-// ---------------------------------------------------------------------------
-
 describe('getNextJamaat', () => {
   it('returns Fajr before Fajr time', () => {
     const result = getNextJamaat(TIMES, ukTime('02:00'))
@@ -73,10 +64,7 @@ describe('getNextJamaat', () => {
     expect(result).toEqual({ prayer: 'isha', time: '22:30', isNextDay: false })
   })
 
-  // ---------------------------------------------------------------------------
   // After Isha edge case
-  // ---------------------------------------------------------------------------
-
   it('returns next day Fajr after Isha has passed', () => {
     const result = getNextJamaat(TIMES, ukTime('23:00'), '04:10')
     expect(result).toEqual({ prayer: 'fajr', time: '04:10', isNextDay: true })
@@ -92,10 +80,7 @@ describe('getNextJamaat', () => {
     expect(result).toBeNull()
   })
 
-  // ---------------------------------------------------------------------------
   // Missing data
-  // ---------------------------------------------------------------------------
-
   it('skips prayers with missing jamaat times', () => {
     const partialTimes = {
       fajrJamaat: null,
@@ -119,10 +104,7 @@ describe('getNextJamaat', () => {
     expect(result).toEqual({ prayer: 'fajr', time: '04:10', isNextDay: true })
   })
 
-  // ---------------------------------------------------------------------------
   // 1 minute after a jamaat — confirm it's skipped
-  // ---------------------------------------------------------------------------
-
   it('skips Fajr 1 minute after its jamaat', () => {
     const result = getNextJamaat(TIMES, ukTime('04:16'))
     expect(result).toEqual({ prayer: 'zuhr', time: '13:30', isNextDay: false })
