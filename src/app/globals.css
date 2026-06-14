@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 
+/* Feasibility card colours — safelisted because they're only referenced as Record values */
+@source inline("bg-green-50 border-green-200 bg-amber-50 border-amber-200 bg-red-50 border-red-200");
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

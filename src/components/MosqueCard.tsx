@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { distanceColour, formatDistance } from '@/lib/utils/distance'
 import { formatCountdown } from '@/lib/utils/formatCountdown'
+import { getFeasibility, type Feasibility } from '@/lib/utils/feasibility'
 import type { NextJamaatResult } from '@/lib/utils/getNextJamaat'
 import FavouriteButton from './FavouriteButton'
 
@@ -25,6 +26,11 @@ const PRAYER_LABELS: Record<string, string> = {
   isha: 'Isha',
 }
 
+const cardStyles: Record<Feasibility, string> = {
+  comfortable: 'border-green-200 bg-green-50',
+  tight: 'border-amber-200 bg-amber-50',
+  'too-late': 'border-red-200 bg-red-50',
+}
 
 export default function MosqueCard({
   id,
@@ -38,8 +44,16 @@ export default function MosqueCard({
   isFavourited,
   userId,
 }: Props) {
+  const feasibility = nextJamaat
+    ? getFeasibility(nextJamaat.minutesUntil, distance, nextJamaat.isNextDay)
+    : null
+
+  const cardClass = feasibility
+    ? cardStyles[feasibility]
+    : 'border-gray-200 bg-white'
+
   return (
-    <div className="relative rounded-xl border border-gray-200 bg-white shadow-sm transition hover:shadow-md active:scale-[0.99]">
+    <div className={`relative rounded-xl border shadow-sm transition hover:shadow-md active:scale-[0.99] ${cardClass}`}>
       {/* Tap target covering the whole card */}
       <Link href={`/mosque/${slug}`} className="absolute inset-0 z-0 rounded-xl" aria-label={name} />
 
@@ -63,7 +77,7 @@ export default function MosqueCard({
           </div>
         </div>
 
-        <div className="mt-3 border-t border-gray-100 pt-3">
+        <div className="mt-3 border-t border-black/5 pt-3">
           {nextJamaat ? (
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-500">
