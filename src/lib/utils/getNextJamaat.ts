@@ -4,6 +4,7 @@ export type NextJamaatResult = {
   prayer: Prayer
   time: string // 'HH:mm'
   isNextDay: boolean
+  minutesUntil: number // minutes from now until jamaat
 }
 
 export type PrayerJamaatTimes = {
@@ -59,15 +60,18 @@ export function getNextJamaat(
 
   for (const { prayer, jamaat } of prayers) {
     if (!jamaat) continue
+    const jamaatMinutes = parseTime(jamaat)
     // >= so that "right now" still shows the current jamaat rather than skipping it
-    if (parseTime(jamaat) >= currentMinutes) {
-      return { prayer, time: jamaat, isNextDay: false }
+    if (jamaatMinutes >= currentMinutes) {
+      return { prayer, time: jamaat, isNextDay: false, minutesUntil: jamaatMinutes - currentMinutes }
     }
   }
 
   // All today's jamaats have passed — next up is tomorrow's Fajr
   if (tomorrowFajr) {
-    return { prayer: 'fajr', time: tomorrowFajr, isNextDay: true }
+    const minutesUntilMidnight = 24 * 60 - currentMinutes
+    const minutesUntil = minutesUntilMidnight + parseTime(tomorrowFajr)
+    return { prayer: 'fajr', time: tomorrowFajr, isNextDay: true, minutesUntil }
   }
 
   return null

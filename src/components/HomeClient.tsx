@@ -23,6 +23,7 @@ type LocationState =
 
 export default function HomeClient({ mosques, favouriteIds, userId }: Props) {
   const [location, setLocation] = useState<LocationState>({ status: 'pending' })
+  const [now, setNow] = useState(() => new Date())
   const favSet = new Set(favouriteIds)
 
   useEffect(() => {
@@ -37,7 +38,11 @@ export default function HomeClient({ mosques, favouriteIds, userId }: Props) {
     )
   }, [])
 
-  const now = new Date()
+  // Update countdowns every minute
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60_000)
+    return () => clearInterval(id)
+  }, [])
 
   const sortedMosques =
     location.status === 'granted'

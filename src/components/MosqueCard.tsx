@@ -24,6 +24,14 @@ const PRAYER_LABELS: Record<string, string> = {
   isha: 'Isha',
 }
 
+function formatCountdown(minutes: number): string {
+  if (minutes === 0) return 'Starting now'
+  if (minutes < 60) return `in ${minutes} min`
+  const h = Math.floor(minutes / 60)
+  const m = minutes % 60
+  return m > 0 ? `in ${h}h ${m}m` : `in ${h}h`
+}
+
 export default function MosqueCard({
   id,
   name,
@@ -68,7 +76,7 @@ export default function MosqueCard({
                 {nextJamaat.isNextDay ? 'Tomorrow' : 'Next'} jamaat
               </span>
               <span className="font-semibold text-gray-900">
-                {PRAYER_LABELS[nextJamaat.prayer]} · {nextJamaat.time}
+                {PRAYER_LABELS[nextJamaat.prayer]} · {formatCountdown(nextJamaat.minutesUntil)}
               </span>
             </div>
           ) : (

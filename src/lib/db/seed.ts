@@ -26,8 +26,14 @@ const sql = neon(process.env.DATABASE_URL!)
 const db = drizzle(sql, { schema })
 
 // Helpers
-function today() {
-  return new Date().toISOString().split('T')[0] // 'YYYY-MM-DD'
+
+/** Returns an array of YYYY-MM-DD strings: today + the next `count` days. */
+function nextDays(count: number): string[] {
+  return Array.from({ length: count + 1 }, (_, i) => {
+    const d = new Date()
+    d.setUTCDate(d.getUTCDate() + i)
+    return d.toISOString().split('T')[0]
+  })
 }
 
 // Mosque data
@@ -253,7 +259,7 @@ async function seed() {
 
   console.log('Seeding mosques...')
 
-  const date = today()
+  const dates = nextDays(9)
 
   for (const m of mosques) {
     const [inserted] = await db.insert(mosque).values(m.mosque).returning({ id: mosque.id })
@@ -261,25 +267,29 @@ async function seed() {
     await db.insert(location).values({ mosqueId: inserted.id, ...m.location })
     await db.insert(contactInfo).values({ mosqueId: inserted.id, ...m.contact })
     await db.insert(amenities).values({ mosqueId: inserted.id, ...m.amenities })
-    await db.insert(prayerTimes).values({
-      mosqueId: inserted.id,
-      date,
-      ...m.prayers,
-      source: m.source,
-      sourceType: 'manual',
-      lastVerifiedAt: new Date(),
-      confidence: 'manual',
-    })
+
+    for (const date of dates) {
+      await db.insert(prayerTimes).values({
+        mosqueId: inserted.id,
+        date,
+        ...m.prayers,
+        source: m.source,
+        sourceType: 'manual',
+        lastVerifiedAt: new Date(),
+        confidence: 'manual',
+      }).onConflictDoNothing()
+    }
+
     await db.insert(dataSource).values({
       mosqueId: inserted.id,
       url: m.source,
       type: 'website',
     })
 
-    console.log(`  ✓ ${m.mosque.name}`)
+    console.log(`  ✓ ${m.mosque.name} (${dates.length} days)`)
   }
 
-  console.log(`\nDone — ${mosques.length} mosques seeded for ${date}.`)
+  console.log(`\nDone — ${mosques.length} mosques seeded for ${dates[0]} → ${dates.at(-1)}.`)
   process.exit(0)
 }
 
