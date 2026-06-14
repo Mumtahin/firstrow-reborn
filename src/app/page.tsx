@@ -3,10 +3,18 @@ import HomeClient from '@/components/HomeClient'
 import AuthButton from '@/components/AuthButton'
 import { auth } from '@/auth'
 
+function dateString(daysFromNow: number): string {
+  const d = new Date()
+  d.setUTCDate(d.getUTCDate() + daysFromNow)
+  return d.toISOString().split('T')[0]
+}
+
 export default async function HomePage() {
-  const today = new Date().toISOString().split('T')[0]
+  const today = dateString(0)
+  const tomorrow = dateString(1)
+
   const [mosques, session] = await Promise.all([
-    getMosquesWithPrayerTimes(today),
+    getMosquesWithPrayerTimes(today, tomorrow),
     auth(),
   ])
 

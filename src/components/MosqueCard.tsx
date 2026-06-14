@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { distanceColour, formatDistance } from '@/lib/utils/distance'
+import { formatCountdown } from '@/lib/utils/formatCountdown'
 import type { NextJamaatResult } from '@/lib/utils/getNextJamaat'
 import FavouriteButton from './FavouriteButton'
 
@@ -24,13 +25,6 @@ const PRAYER_LABELS: Record<string, string> = {
   isha: 'Isha',
 }
 
-function formatCountdown(minutes: number): string {
-  if (minutes === 0) return 'Starting now'
-  if (minutes < 60) return `in ${minutes} min`
-  const h = Math.floor(minutes / 60)
-  const m = minutes % 60
-  return m > 0 ? `in ${h}h ${m}m` : `in ${h}h`
-}
 
 export default function MosqueCard({
   id,

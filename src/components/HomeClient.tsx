@@ -50,10 +50,10 @@ export default function HomeClient({ mosques, favouriteIds, userId }: Props) {
           .map((m) => ({
             ...m,
             distance: haversineDistance(location.lat, location.lng, m.lat, m.lng),
-            nextJamaat: getNextJamaat(m, now),
+            nextJamaat: getNextJamaat(m, now, m.tomorrowFajrJamaat),
           }))
           .sort((a, b) => a.distance - b.distance)
-      : mosques.map((m) => ({ ...m, distance: null, nextJamaat: getNextJamaat(m, now) }))
+      : mosques.map((m) => ({ ...m, distance: null, nextJamaat: getNextJamaat(m, now, m.tomorrowFajrJamaat) }))
 
   return (
     <div className="flex flex-col gap-4">

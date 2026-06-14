@@ -1,4 +1,5 @@
 import { and, eq } from 'drizzle-orm'
+import { alias } from 'drizzle-orm/pg-core'
 import { db } from './index'
 import { amenities, contactInfo, favourite, location, mosque, prayerTimes } from './schema'
 
@@ -16,10 +17,17 @@ export type MosqueWithTimes = {
   asrJamaat: string | null
   maghribJamaat: string | null
   ishaJamaat: string | null
+  tomorrowFajrJamaat: string | null
 }
 
-/** Fetches all active mosques with their location and prayer times for a given date. */
-export async function getMosquesWithPrayerTimes(date: string): Promise<MosqueWithTimes[]> {
+/** Fetches all active mosques with their location and prayer times for a given date,
+ *  plus tomorrow's Fajr jamaat so the "next jamaat" countdown can roll over midnight. */
+export async function getMosquesWithPrayerTimes(
+  date: string,
+  tomorrowDate: string
+): Promise<MosqueWithTimes[]> {
+  const tomorrowTimes = alias(prayerTimes, 'tomorrow_times')
+
   const rows = await db
     .select({
       id: mosque.id,
@@ -35,12 +43,17 @@ export async function getMosquesWithPrayerTimes(date: string): Promise<MosqueWit
       asrJamaat: prayerTimes.asrJamaat,
       maghribJamaat: prayerTimes.maghribJamaat,
       ishaJamaat: prayerTimes.ishaJamaat,
+      tomorrowFajrJamaat: tomorrowTimes.fajrJamaat,
     })
     .from(mosque)
     .innerJoin(location, eq(location.mosqueId, mosque.id))
     .leftJoin(
       prayerTimes,
       and(eq(prayerTimes.mosqueId, mosque.id), eq(prayerTimes.date, date))
+    )
+    .leftJoin(
+      tomorrowTimes,
+      and(eq(tomorrowTimes.mosqueId, mosque.id), eq(tomorrowTimes.date, tomorrowDate))
     )
     .where(eq(mosque.status, 'active'))
 
@@ -84,11 +97,15 @@ export async function getFavouriteIds(userId: string): Promise<Set<number>> {
   return new Set(rows.map((r) => r.mosqueId))
 }
 
-/** Fetches a user's favourited mosques with location and prayer times for a given date. */
+/** Fetches a user's favourited mosques with location and prayer times for a given date,
+ *  plus tomorrow's Fajr jamaat for midnight rollover. */
 export async function getFavouritedMosques(
   userId: string,
-  date: string
+  date: string,
+  tomorrowDate: string
 ): Promise<MosqueWithTimes[]> {
+  const tomorrowTimes = alias(prayerTimes, 'tomorrow_times')
+
   const rows = await db
     .select({
       id: mosque.id,
@@ -104,6 +121,7 @@ export async function getFavouritedMosques(
       asrJamaat: prayerTimes.asrJamaat,
       maghribJamaat: prayerTimes.maghribJamaat,
       ishaJamaat: prayerTimes.ishaJamaat,
+      tomorrowFajrJamaat: tomorrowTimes.fajrJamaat,
     })
     .from(favourite)
     .innerJoin(mosque, and(eq(mosque.id, favourite.mosqueId), eq(mosque.status, 'active')))
@@ -111,6 +129,10 @@ export async function getFavouritedMosques(
     .leftJoin(
       prayerTimes,
       and(eq(prayerTimes.mosqueId, mosque.id), eq(prayerTimes.date, date))
+    )
+    .leftJoin(
+      tomorrowTimes,
+      and(eq(tomorrowTimes.mosqueId, mosque.id), eq(tomorrowTimes.date, tomorrowDate))
     )
     .where(eq(favourite.userId, userId))
 

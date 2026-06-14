@@ -11,9 +11,10 @@ export default async function FavouritesPage() {
 
   const userId = session.user.id
   const today = new Date().toISOString().split('T')[0]
+  const tomorrow = new Date(Date.now() + 86400_000).toISOString().split('T')[0]
 
   const [mosques, favouriteIds] = await Promise.all([
-    getFavouritedMosques(userId, today),
+    getFavouritedMosques(userId, today, tomorrow),
     getFavouriteIds(userId),
   ])
 
@@ -52,7 +53,7 @@ export default async function FavouritesPage() {
               town={m.town}
               postcode={m.postcode}
               distance={null}
-              nextJamaat={getNextJamaat(m, now)}
+              nextJamaat={getNextJamaat(m, now, m.tomorrowFajrJamaat)}
               isFavourited={favouriteIds.has(m.id)}
               userId={userId}
             />
