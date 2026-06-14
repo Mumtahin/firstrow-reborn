@@ -16,7 +16,6 @@ export const metadata: Metadata = {
   title: 'FirstRow',
   description: 'Find your next jamaat nearby',
   icons: {
-    icon: '/favicon.ico',
     apple: '/apple-touch-icon.png',
   },
 }

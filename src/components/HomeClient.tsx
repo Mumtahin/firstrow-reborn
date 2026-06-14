@@ -77,6 +77,9 @@ export default function HomeClient({ mosques, favouriteIds, userId }: Props) {
       )}
 
       <div className="flex flex-col gap-3">
+        <h2 className="text-sm tracking-wide text-gray-400">
+          {location.status === 'granted' ? 'Nearest mosques' : 'All mosques'}
+        </h2>
         {sortedMosques.map((m) => (
           <MosqueCard
             key={m.id}

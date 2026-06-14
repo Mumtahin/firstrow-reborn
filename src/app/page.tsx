@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { getMosquesWithPrayerTimes, getFavouriteIds } from '@/lib/db/queries'
 import HomeClient from '@/components/HomeClient'
 import AuthButton from '@/components/AuthButton'
@@ -25,8 +26,17 @@ export default async function HomePage() {
     <main className="mx-auto max-w-lg px-4 py-6">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">FirstRow</h1>
-          <p className="text-sm text-gray-500">Find your next jamaat nearby</p>
+          <div className="flex items-center gap-2">
+            <Image
+              src="/apple-touch-icon.png"
+              alt="FirstRow"
+              width={28}
+              height={28}
+              className="rounded-lg"
+            />
+            <h1 className="text-2xl font-bold text-gray-900">FirstRow</h1>
+          </div>
+          {/* <p className="text-sm text-gray-500">Find your next jamaat nearby</p> */}
         </div>
         <AuthButton />
       </div>
