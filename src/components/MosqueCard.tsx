@@ -43,18 +43,22 @@ export default function MosqueCard({
 
       {/* Card content — pointer-events-none so clicks fall through to the Link */}
       <div className="pointer-events-none p-4">
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <h2 className="truncate font-semibold text-gray-900">{name}</h2>
             <p className="mt-0.5 truncate text-sm text-gray-500">
               {addressLine1}, {town}, {postcode}
             </p>
           </div>
-          {distance !== null && (
-            <span className={`shrink-0 text-sm font-medium ${distanceColour(distance)}`}>
-              {formatDistance(distance)}
-            </span>
-          )}
+          <div className="flex shrink-0 items-center gap-1">
+            {distance !== null && (
+              <span className={`text-sm font-medium ${distanceColour(distance)}`}>
+                {formatDistance(distance)}
+              </span>
+            )}
+            {/* Spacer so the heart doesn't overlap — actual button rendered below */}
+            <span className="h-8 w-8" />
+          </div>
         </div>
 
         <div className="mt-3 border-t border-gray-100 pt-3">
@@ -73,8 +77,8 @@ export default function MosqueCard({
         </div>
       </div>
 
-      {/* Favourite button sits above the Link overlay */}
-      <div className="absolute bottom-3 right-3 z-10">
+      {/* Favourite button — z-10 so it sits above the Link overlay */}
+      <div className="absolute right-3 top-3 z-10">
         <FavouriteButton mosqueId={id} isFavourited={isFavourited} userId={userId} />
       </div>
     </div>
