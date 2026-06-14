@@ -1,3 +1,4 @@
+import type { AdapterAccountType } from 'next-auth/adapters'
 import {
   boolean,
   date,
@@ -83,7 +84,7 @@ export const prayerTimes = pgTable(
     zuhrJamaat: text('zuhr_jamaat'),
 
     asrStart: text('asr_start'),
-    asrAltStart: text('asr_alt_start'), // Hanafi alternative, if mosque publishes both
+    asrAltStart: text('asr_alt_start'),
     asrJamaat: text('asr_jamaat'),
 
     maghribStart: text('maghrib_start'),
@@ -92,7 +93,7 @@ export const prayerTimes = pgTable(
     ishaStart: text('isha_start'),
     ishaJamaat: text('isha_jamaat'),
 
-    source: text('source'), // URL or description of where data came from
+    source: text('source'),
     sourceType: sourceTypeEnum('source_type'),
     lastVerifiedAt: timestamp('last_verified_at'),
     confidence: confidenceEnum('confidence'),
@@ -113,24 +114,62 @@ export const dataSource = pgTable('data_source', {
   lastError: text('last_error'),
 })
 
-// User
-// Note: columns will be extended for NextAuth compatibility in Phase 3.
+// Auth — NextAuth (Auth.js) compatible tables
 export const user = pgTable('user', {
-  id: serial('id').primaryKey(),
-  email: text('email').notNull().unique(),
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   name: text('name'),
-  profilePicture: text('profile_picture'),
-  googleId: text('google_id').notNull().unique(),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
+  email: text('email').unique(),
+  emailVerified: timestamp('emailVerified', { mode: 'date' }),
+  image: text('image'),
 })
+
+export const account = pgTable(
+  'account',
+  {
+    userId: text('userId')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    type: text('type').$type<AdapterAccountType>().notNull(),
+    provider: text('provider').notNull(),
+    providerAccountId: text('providerAccountId').notNull(),
+    refresh_token: text('refresh_token'),
+    access_token: text('access_token'),
+    expires_at: integer('expires_at'),
+    token_type: text('token_type'),
+    scope: text('scope'),
+    id_token: text('id_token'),
+    session_state: text('session_state'),
+  },
+  (t) => [primaryKey({ columns: [t.provider, t.providerAccountId] })]
+)
+
+export const session = pgTable('session', {
+  sessionToken: text('sessionToken').primaryKey(),
+  userId: text('userId')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  expires: timestamp('expires', { mode: 'date' }).notNull(),
+})
+
+export const verificationToken = pgTable(
+  'verificationToken',
+  {
+    identifier: text('identifier').notNull(),
+    token: text('token').notNull(),
+    expires: timestamp('expires', { mode: 'date' }).notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.identifier, t.token] })]
+)
 
 // Favourite
 export const favourite = pgTable(
   'favourite',
   {
-    userId: integer('user_id')
+    userId: text('user_id')
       .notNull()
-      .references(() => user.id),
+      .references(() => user.id, { onDelete: 'cascade' }),
     mosqueId: integer('mosque_id')
       .notNull()
       .references(() => mosque.id),
