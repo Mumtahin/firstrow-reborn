@@ -13,9 +13,13 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'FirstRow',
+  title: {
+    default: 'FirstRow | Find your next jamaat nearby',
+    template: '%s | FirstRow',
+  },
   description: 'Find your next jamaat nearby',
   icons: {
+    icon: '/apple-touch-icon.png',
     apple: '/apple-touch-icon.png',
   },
 }
