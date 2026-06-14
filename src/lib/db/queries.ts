@@ -64,6 +64,8 @@ export type MosqueDetail = {
   id: number
   name: string
   slug: string
+  lat: number | null
+  lng: number | null
   addressLine1: string | null
   addressLine2: string | null
   town: string | null
@@ -149,6 +151,8 @@ export async function getMosqueBySlug(
       id: mosque.id,
       name: mosque.name,
       slug: mosque.slug,
+      lat: location.lat,
+      lng: location.lng,
       addressLine1: location.addressLine1,
       addressLine2: location.addressLine2,
       town: location.town,

@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useCallback, useRef } from 'react'
 import Map, { Layer, Marker, Source } from 'react-map-gl/mapbox'
+import CrosshairIcon from '@/components/icons/CrosshairIcon'
 import type { MapRef } from 'react-map-gl/mapbox'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import type { MosqueWithTimes } from '@/lib/db/queries'
@@ -61,17 +62,7 @@ export default function MosqueMap({ mosques, userLat, userLng }: Props) {
         className="absolute top-2 left-2 flex h-9 w-9 items-center justify-center rounded-lg bg-white shadow-md hover:bg-gray-50"
         aria-label="Recenter map"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5 text-gray-700"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <circle cx="12" cy="12" r="3" />
-          <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
-        </svg>
+        <CrosshairIcon className="h-5 w-5 text-gray-700" />
       </button>
     </div>
   )

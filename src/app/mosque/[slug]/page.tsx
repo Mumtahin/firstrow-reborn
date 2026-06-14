@@ -4,6 +4,8 @@ import { auth } from '@/auth'
 import { getMosqueBySlug, getFavouriteIds } from '@/lib/db/queries'
 import { getNextJamaat } from '@/lib/utils/getNextJamaat'
 import FavouriteButton from '@/components/FavouriteButton'
+import ChevronLeftIcon from '@/components/icons/ChevronLeftIcon'
+import MapPinIcon from '@/components/icons/MapPinIcon'
 
 // Helpers
 const PRAYERS = [
@@ -108,9 +110,7 @@ export default async function MosqueDetailPage({
     <main className="mx-auto max-w-lg px-4 py-6">
       {/* Back */}
       <Link href="/" className="mb-6 flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800">
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-        </svg>
+        <ChevronLeftIcon className="h-4 w-4" />
         Back
       </Link>
 
@@ -124,6 +124,18 @@ export default async function MosqueDetailPage({
           {mosque.addressLine1}{mosque.addressLine2 ? `, ${mosque.addressLine2}` : ''},{' '}
           {mosque.town}, {mosque.postcode}
         </p>
+      )}
+
+      {mosque.lat && mosque.lng && (
+        <a
+          href={`https://maps.google.com/?q=${mosque.lat},${mosque.lng}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600"
+        >
+          <MapPinIcon className="h-3.5 w-3.5" />
+          Open in Maps
+        </a>
       )}
 
       {/* Amenities */}
