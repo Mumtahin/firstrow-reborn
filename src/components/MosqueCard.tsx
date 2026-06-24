@@ -31,8 +31,9 @@ function countdownDisplay(minutes: number): { value: string; unit: string } {
   return { value: `${h}h ${m}`, unit: 'm' }
 }
 
-function urgencyColour(minutes: number, isNextDay: boolean): string {
+function urgencyColour(minutes: number, isNextDay: boolean, justStarted?: boolean): string {
   if (isNextDay) return 'text-text-tertiary'
+  if (justStarted) return 'text-urgent-go'
   if (minutes >= 18) return 'text-urgent-go'
   if (minutes >= 5) return 'text-urgent-tight'
   return 'text-urgent-late'
@@ -64,20 +65,29 @@ export default function MosqueCard({
         {/* TOP: countdown + prayer name/time */}
         {nextJamaat ? (() => {
           const { value, unit } = countdownDisplay(nextJamaat.minutesUntil)
-          const colour = urgencyColour(nextJamaat.minutesUntil, nextJamaat.isNextDay)
+          const colour = urgencyColour(nextJamaat.minutesUntil, nextJamaat.isNextDay, nextJamaat.justStarted)
+          const label = nextJamaat.justStarted ? 'Just started' : nextJamaat.isNextDay ? 'Tomorrow' : 'Starts in'
           return (
             <div className="flex items-end justify-between">
               <div>
                 <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary">
-                  {nextJamaat.isNextDay ? 'Tomorrow' : 'Starts in'}
+                  {label}
                 </p>
                 <div className="flex items-baseline">
-                  <span className={`font-mono text-[32px] font-bold leading-[0.9] tracking-[-0.03em] ${colour}`}>
-                    {value}
-                  </span>
-                  <span className={`ml-[7px] text-[17px] font-semibold ${colour}`}>
-                    {unit}
-                  </span>
+                  {nextJamaat.justStarted ? (
+                    <span className={`text-[22px] font-bold leading-[0.9] tracking-[-0.02em] ${colour}`}>
+                      Now
+                    </span>
+                  ) : (
+                    <>
+                      <span className={`font-mono text-[32px] font-bold leading-[0.9] tracking-[-0.03em] ${colour}`}>
+                        {value}
+                      </span>
+                      <span className={`ml-[7px] text-[17px] font-semibold ${colour}`}>
+                        {unit}
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
               <div className="text-right">

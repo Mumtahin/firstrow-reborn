@@ -151,24 +151,33 @@ export default async function MosqueDetailPage({
         {/* Hero card */}
         {showHero && (() => {
           const { value, unit } = countdownHero(nextJamaat.minutesUntil)
-          const colour =
-            nextJamaat.minutesUntil >= 18 ? 'text-urgent-go'
+          const colour = nextJamaat.justStarted ? 'text-urgent-go'
+            : nextJamaat.minutesUntil >= 18 ? 'text-urgent-go'
             : nextJamaat.minutesUntil >= 5 ? 'text-urgent-tight'
             : 'text-urgent-late'
+          const heroLabel = nextJamaat.justStarted ? 'Just started' : 'Next jamaat starts in'
           return (
             <div className="flex flex-col gap-4 rounded-[18px] border border-card-border bg-white p-[18px] shadow-card">
               <div className="flex items-end justify-between">
                 <div>
                   <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-text-tertiary">
-                    Next jamaat starts in
+                    {heroLabel}
                   </p>
                   <div className="flex items-baseline">
-                    <span className={`font-mono text-[52px] font-bold leading-[0.9] tracking-[-0.03em] ${colour}`}>
-                      {value}
-                    </span>
-                    <span className={`ml-[7px] text-[20px] font-semibold ${colour}`}>
-                      {unit}
-                    </span>
+                    {nextJamaat.justStarted ? (
+                      <span className={`text-[36px] font-bold leading-[0.9] tracking-[-0.02em] ${colour}`}>
+                        Now
+                      </span>
+                    ) : (
+                      <>
+                        <span className={`font-mono text-[52px] font-bold leading-[0.9] tracking-[-0.03em] ${colour}`}>
+                          {value}
+                        </span>
+                        <span className={`ml-[7px] text-[20px] font-semibold ${colour}`}>
+                          {unit}
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
                 <div className="text-right">

@@ -4,7 +4,8 @@ export type NextJamaatResult = {
   prayer: Prayer
   time: string // 'HH:mm'
   isNextDay: boolean
-  minutesUntil: number // minutes from now until jamaat
+  minutesUntil: number // minutes from now until jamaat; 0 when justStarted
+  justStarted?: boolean // true when jamaat started ≤5 min ago
 }
 
 export type PrayerJamaatTimes = {
@@ -61,9 +62,12 @@ export function getNextJamaat(
   for (const { prayer, jamaat } of prayers) {
     if (!jamaat) continue
     const jamaatMinutes = parseTime(jamaat)
-    // >= so that "right now" still shows the current jamaat rather than skipping it
     if (jamaatMinutes >= currentMinutes) {
       return { prayer, time: jamaat, isNextDay: false, minutesUntil: jamaatMinutes - currentMinutes }
+    }
+    // Jamaat started within the last 10 minutes — still worth showing
+    if (currentMinutes - jamaatMinutes <= 10) {
+      return { prayer, time: jamaat, isNextDay: false, minutesUntil: 0, justStarted: true }
     }
   }
 
