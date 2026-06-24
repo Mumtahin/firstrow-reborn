@@ -72,7 +72,7 @@ export default function MosqueCard({
                   {nextJamaat.isNextDay ? 'Tomorrow' : 'Starts in'}
                 </p>
                 <div className="flex items-baseline">
-                  <span className={`font-mono text-[36px] font-bold leading-[0.9] tracking-[-0.03em] ${colour}`}>
+                  <span className={`font-mono text-[32px] font-bold leading-[0.9] tracking-[-0.03em] ${colour}`}>
                     {value}
                   </span>
                   <span className={`ml-[7px] text-[17px] font-semibold ${colour}`}>
