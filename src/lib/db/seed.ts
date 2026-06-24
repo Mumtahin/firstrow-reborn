@@ -185,8 +185,8 @@ const mosques = [
       addressLine2: null,
       town: 'London',
       postcode: 'E2 0FT',
-      lat: 51.5265,
-      lng: -0.0624,
+      lat: 51.5249628,
+      lng: -0.0529009,
     },
     contact: {
       website: 'https://baitulaman.org',

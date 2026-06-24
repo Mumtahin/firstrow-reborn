@@ -1,7 +1,6 @@
 import Link from 'next/link'
-import { distanceColour, formatDistance } from '@/lib/utils/distance'
+import { formatDistance } from '@/lib/utils/distance'
 import { formatCountdown } from '@/lib/utils/formatCountdown'
-import { getFeasibility, type Feasibility } from '@/lib/utils/feasibility'
 import type { NextJamaatResult } from '@/lib/utils/getNextJamaat'
 import FavouriteButton from './FavouriteButton'
 
@@ -26,12 +25,6 @@ const PRAYER_LABELS: Record<string, string> = {
   isha: 'Isha',
 }
 
-const cardStyles: Record<Feasibility, string> = {
-  comfortable: 'border-green-200 bg-green-50',
-  tight: 'border-amber-200 bg-amber-50',
-  'too-late': 'border-red-200 bg-red-50',
-}
-
 export default function MosqueCard({
   id,
   name,
@@ -44,18 +37,10 @@ export default function MosqueCard({
   isFavourited,
   userId,
 }: Props) {
-  const feasibility = nextJamaat
-    ? getFeasibility(nextJamaat.minutesUntil, distance, nextJamaat.isNextDay)
-    : null
-
-  const cardClass = feasibility
-    ? cardStyles[feasibility]
-    : 'border-gray-200 bg-white'
-
   return (
-    <div className={`relative rounded-xl border shadow-sm transition hover:shadow-md active:scale-[0.99] ${cardClass}`}>
+    <div className="relative rounded-2xl border border-[#EAEAEA] bg-white shadow-[0_1px_2px_rgba(17,17,17,0.04)] transition active:scale-[0.99]">
       {/* Tap target covering the whole card */}
-      <Link href={`/mosque/${slug}`} className="absolute inset-0 z-0 rounded-xl" aria-label={name} />
+      <Link href={`/mosque/${slug}`} className="absolute inset-0 z-0 rounded-2xl" aria-label={name} />
 
       {/* Card content — pointer-events-none so clicks fall through to the Link */}
       <div className="pointer-events-none p-4">
@@ -68,7 +53,7 @@ export default function MosqueCard({
           </div>
           <div className="flex shrink-0 items-center gap-1">
             {distance !== null && (
-              <span className={`text-sm font-medium ${distanceColour(distance)}`}>
+              <span className="text-sm font-medium text-[#666]">
                 {formatDistance(distance)}
               </span>
             )}
