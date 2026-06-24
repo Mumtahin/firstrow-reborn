@@ -7,16 +7,20 @@ import ChevronDownIcon from '@/components/icons/ChevronDownIcon'
 import SearchIcon from '@/components/icons/SearchIcon'
 import UserIcon from '@/components/icons/UserIcon'
 import AccountPanel from '@/components/AccountPanel'
+import SearchOverlay from '@/components/SearchOverlay'
+import type { MosqueWithTimes } from '@/lib/db/queries'
 
 interface HomeHeaderProps {
   userId: string | null
   userName: string | null
   userImage: string | null
+  mosques: MosqueWithTimes[]
 }
 
-export default function HomeHeader({ userId, userName, userImage }: HomeHeaderProps) {
+export default function HomeHeader({ userId, userName, userImage, mosques }: HomeHeaderProps) {
   const [locationLabel, setLocationLabel] = useState<string | null>(null)
   const [panelOpen, setPanelOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
 
   useEffect(() => {
     const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
@@ -59,6 +63,7 @@ export default function HomeHeader({ userId, userName, userImage }: HomeHeaderPr
           <button
             aria-label="Search"
             className="flex h-[38px] w-[38px] items-center justify-center rounded-full border border-card-border bg-white"
+            onClick={() => setSearchOpen(true)}
           >
             <SearchIcon className="h-[16px] w-[16px] text-text-primary" />
           </button>
@@ -88,6 +93,12 @@ export default function HomeHeader({ userId, userName, userImage }: HomeHeaderPr
         isSignedIn={!!userId}
         userName={userName}
         userImage={userImage}
+      />
+
+      <SearchOverlay
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        mosques={mosques}
       />
     </>
   )

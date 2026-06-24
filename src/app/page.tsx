@@ -23,7 +23,7 @@ export default async function HomePage() {
 
   return (
     <main className="mx-auto w-full max-w-lg">
-      <HomeHeader userId={userId} userName={session?.user?.name ?? null} userImage={session?.user?.image ?? null} />
+      <HomeHeader userId={userId} userName={session?.user?.name ?? null} userImage={session?.user?.image ?? null} mosques={mosques} />
       <HomeClient mosques={mosques} favouriteIds={favouriteIds} userId={userId} />
     </main>
   )
