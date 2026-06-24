@@ -210,6 +210,76 @@ const mosques = [
     source: 'https://baitulaman.org',
   },
   {
+    mosque: { name: 'Dorset Community Association', slug: 'dorset-community-association', status: 'active' as const },
+    location: {
+      addressLine1: 'Diss St',
+      addressLine2: 'Bethnal Green',
+      town: 'London',
+      postcode: 'E2 7QX',
+      lat: 51.5301163,  
+      lng: -0.0724039,  
+    },
+    contact: { website: 'https://dorsetca.org', phone: '02077399371', email: 'info@dorsetca.org' },
+    amenities: { hasWomensSpace: false, hasCarPark: false, hasDisabilityAccess: true },
+    source: null,
+  },
+  {
+    mosque: { name: 'Shahporan Masjid & Islamic Centre Trust', slug: 'shahporan-masjid', status: 'active' as const },
+    location: {
+      addressLine1: '444 Hackney Rd',
+      addressLine2: null,
+      town: 'London',
+      postcode: 'E2 6QL',
+      lat: 51.5320385,   
+      lng: -0.0603459,   
+    },
+    contact: { website: 'http://shahporanmasjid.uk', phone: '02070331843', email: null },
+    amenities: { hasWomensSpace: true, hasCarPark: false, hasDisabilityAccess: true },
+    source: null,
+  },
+  {
+    mosque: { name: 'Globe Town (Bethnal Green) Mosque', slug: 'globe-town-bethnal-green-mosque', status: 'active' as const },
+    location: {
+      addressLine1: '100 Roman Rd',
+      addressLine2: 'Bethnal Green',
+      town: 'London',
+      postcode: 'E2 0RN',
+      lat: 51.5287901,
+      lng:  -0.0482831,  
+    },
+    amenities: { hasWomensSpace: false, hasCarPark: false, hasDisabilityAccess: true },
+    contact: { website: null, phone: '07956 402599', email: null },
+    source: null,
+  },
+  {
+    mosque: { name: 'Esha Atul Islam Mosque', slug: 'esha-atul-islam-mosque', status: 'active' as const },
+    location: {
+      addressLine1: '16 Ford Square',
+      addressLine2: null,
+      town: 'London',
+      postcode: 'E1 2HS',
+      lat: 51.5160916,   
+      lng: -0.0564789 
+    },
+    contact: { website: 'http://www.fordsquaremasjid.org', phone: '020 7790 0693', email: 'info@fordsquaremasjid.org' },
+    amenities: { hasWomensSpace: true, hasCarPark: false, hasDisabilityAccess: true },
+    source: null,
+  },
+  {
+    mosque: { name: 'Darul Ummah', slug: 'darul-ummah', status: 'active' as const },
+    location: {
+      addressLine1: '56 Bigland Street',
+      addressLine2: null,
+      town: 'London',
+      postcode: 'E1 2ND',
+      lat: 51.5126261, 
+      lng: -0.0582466
+    },
+    contact: { website: 'http://www.darulummah.org.uk', phone: '0207 790 5166', email: 'info@darulummah.org.uk' },
+    amenities: { hasWomensSpace: true, hasCarPark: true, hasDisabilityAccess: true },
+    source: null,
+  },
+  {
     mosque: { name: 'Leeds Grand Mosque', slug: 'leeds-grand-mosque', status: 'active' as const },
     location: {
       addressLine1: '9 Woodsley Road',
@@ -280,11 +350,13 @@ async function seed() {
       }).onConflictDoNothing()
     }
 
-    await db.insert(dataSource).values({
-      mosqueId: inserted.id,
-      url: m.source,
-      type: 'website',
-    })
+    if (m.source) {
+      await db.insert(dataSource).values({
+        mosqueId: inserted.id,
+        url: m.source,
+        type: 'website',
+      })
+    }
 
     console.log(`  ✓ ${m.mosque.name} (${dates.length} days)`)
   }
