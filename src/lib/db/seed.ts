@@ -1,6 +1,6 @@
 /**
- * Seed script — 5 real UK mosques with realistic prayer times.
- * Destructive: clears all tables before re-seeding.
+ * Seed script — idempotent upsert on slug.
+ * Safe to re-run: existing mosque IDs are preserved, user data is never touched.
  *
  * Run with: npm run db:seed
  */
@@ -8,6 +8,7 @@
 import * as dotenv from 'dotenv'
 dotenv.config({ path: '.env.local' })
 
+import { eq } from 'drizzle-orm'
 import { neon } from '@neondatabase/serverless'
 import { drizzle } from 'drizzle-orm/neon-http'
 import * as schema from './schema'
@@ -15,11 +16,9 @@ import {
   amenities,
   contactInfo,
   dataSource,
-  favourite,
   location,
   mosque,
   prayerTimes,
-  user,
 } from './schema'
 
 const sql = neon(process.env.DATABASE_URL!)
@@ -175,11 +174,7 @@ const mosques = [
     source: 'https://www.manchestercentralmosque.org/prayer-times',
   },
   {
-    mosque: {
-      name: 'Baitul Aman Mosque & Cultural Centre',
-      slug: 'baitul-aman-mosque',
-      status: 'active' as const,
-    },
+    mosque: { name: 'Baitul Aman Mosque & Cultural Centre', slug: 'baitul-aman-mosque', status: 'active' as const },
     location: {
       addressLine1: '101 Braintree Street',
       addressLine2: null,
@@ -216,8 +211,8 @@ const mosques = [
       addressLine2: 'Bethnal Green',
       town: 'London',
       postcode: 'E2 7QX',
-      lat: 51.5301163,  
-      lng: -0.0724039,  
+      lat: 51.5301163,
+      lng: -0.0724039,
     },
     contact: { website: 'https://dorsetca.org', phone: '02077399371', email: 'info@dorsetca.org' },
     amenities: { hasWomensSpace: false, hasCarPark: false, hasDisabilityAccess: true },
@@ -230,8 +225,8 @@ const mosques = [
       addressLine2: null,
       town: 'London',
       postcode: 'E2 6QL',
-      lat: 51.5320385,   
-      lng: -0.0603459,   
+      lat: 51.5320385,
+      lng: -0.0603459,
     },
     contact: { website: 'http://shahporanmasjid.uk', phone: '02070331843', email: null },
     amenities: { hasWomensSpace: true, hasCarPark: false, hasDisabilityAccess: true },
@@ -245,7 +240,7 @@ const mosques = [
       town: 'London',
       postcode: 'E2 0RN',
       lat: 51.5287901,
-      lng:  -0.0482831,  
+      lng: -0.0482831,
     },
     amenities: { hasWomensSpace: false, hasCarPark: false, hasDisabilityAccess: true },
     contact: { website: null, phone: '07956 402599', email: null },
@@ -258,8 +253,8 @@ const mosques = [
       addressLine2: null,
       town: 'London',
       postcode: 'E1 2HS',
-      lat: 51.5160916,   
-      lng: -0.0564789 
+      lat: 51.5160916,
+      lng: -0.0564789,
     },
     contact: { website: 'http://www.fordsquaremasjid.org', phone: '020 7790 0693', email: 'info@fordsquaremasjid.org' },
     amenities: { hasWomensSpace: true, hasCarPark: false, hasDisabilityAccess: true },
@@ -272,8 +267,8 @@ const mosques = [
       addressLine2: null,
       town: 'London',
       postcode: 'E1 2ND',
-      lat: 51.5126261, 
-      lng: -0.0582466
+      lat: 51.5126261,
+      lng: -0.0582466,
     },
     contact: { website: 'http://www.darulummah.org.uk', phone: '0207 790 5166', email: 'info@darulummah.org.uk' },
     amenities: { hasWomensSpace: true, hasCarPark: true, hasDisabilityAccess: true },
@@ -315,50 +310,62 @@ const mosques = [
 // Seed
 
 async function seed() {
-  console.log('Clearing tables...')
-
-  // Delete in FK-safe order
-  await db.delete(favourite)
-  await db.delete(prayerTimes)
-  await db.delete(dataSource)
-  await db.delete(amenities)
-  await db.delete(contactInfo)
-  await db.delete(location)
-  await db.delete(user)
-  await db.delete(mosque)
-
-  console.log('Seeding mosques...')
-
   const dates = nextDays(9)
 
+  console.log('Seeding mosques (upsert — IDs preserved)...\n')
+
   for (const m of mosques) {
-    const [inserted] = await db.insert(mosque).values(m.mosque).returning({ id: mosque.id })
-
-    await db.insert(location).values({ mosqueId: inserted.id, ...m.location })
-    await db.insert(contactInfo).values({ mosqueId: inserted.id, ...m.contact })
-    await db.insert(amenities).values({ mosqueId: inserted.id, ...m.amenities })
-
-    for (const date of dates) {
-      await db.insert(prayerTimes).values({
-        mosqueId: inserted.id,
-        date,
-        ...m.prayers,
-        source: m.source,
-        sourceType: 'manual',
-        lastVerifiedAt: new Date(),
-        confidence: 'manual',
-      }).onConflictDoNothing()
-    }
-
-    if (m.source) {
-      await db.insert(dataSource).values({
-        mosqueId: inserted.id,
-        url: m.source,
-        type: 'website',
+    // Upsert mosque on slug — preserves the existing ID if the row already exists
+    const [inserted] = await db
+      .insert(mosque)
+      .values(m.mosque)
+      .onConflictDoUpdate({
+        target: mosque.slug,
+        set: { name: m.mosque.name, status: m.mosque.status, updatedAt: new Date() },
       })
+      .returning({ id: mosque.id })
+
+    // Upsert 1-1 child tables (mosqueId is PK on each)
+    await db
+      .insert(location)
+      .values({ mosqueId: inserted.id, ...m.location })
+      .onConflictDoUpdate({ target: location.mosqueId, set: m.location })
+
+    await db
+      .insert(contactInfo)
+      .values({ mosqueId: inserted.id, ...m.contact })
+      .onConflictDoUpdate({ target: contactInfo.mosqueId, set: m.contact })
+
+    await db
+      .insert(amenities)
+      .values({ mosqueId: inserted.id, ...m.amenities })
+      .onConflictDoUpdate({ target: amenities.mosqueId, set: m.amenities })
+
+    // Prayer times — skip dates already present (pipeline owns updates)
+    if (m.prayers) {
+      for (const date of dates) {
+        await db
+          .insert(prayerTimes)
+          .values({
+            mosqueId: inserted.id,
+            date,
+            ...m.prayers,
+            source: m.source,
+            sourceType: 'manual',
+            lastVerifiedAt: new Date(),
+            confidence: 'manual',
+          })
+          .onConflictDoNothing()
+      }
     }
 
-    console.log(`  ✓ ${m.mosque.name} (${dates.length} days)`)
+    // Data source — replace for this mosque (pipeline config, no user data)
+    if (m.source) {
+      await db.delete(dataSource).where(eq(dataSource.mosqueId, inserted.id))
+      await db.insert(dataSource).values({ mosqueId: inserted.id, url: m.source, type: 'website' })
+    }
+
+    console.log(`  ✓ ${m.mosque.name} (id: ${inserted.id})`)
   }
 
   console.log(`\nDone — ${mosques.length} mosques seeded for ${dates[0]} → ${dates.at(-1)}.`)
