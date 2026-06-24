@@ -66,7 +66,7 @@ export default function MosqueCard({
         {nextJamaat ? (() => {
           const { value, unit } = countdownDisplay(nextJamaat.minutesUntil)
           const colour = urgencyColour(nextJamaat.minutesUntil, nextJamaat.isNextDay, nextJamaat.justStarted)
-          const label = nextJamaat.justStarted ? 'Just started' : nextJamaat.isNextDay ? 'Tomorrow' : 'Starts in'
+          const label = nextJamaat.justStarted ? 'Just started' : nextJamaat.isNextDay ? 'All done' : 'Starts in'
           return (
             <div className="flex items-end justify-between">
               <div>
@@ -93,6 +93,9 @@ export default function MosqueCard({
               <div className="text-right">
                 <p className="text-[13px] font-semibold text-text-primary">
                   {PRAYER_LABELS[nextJamaat.prayer]}
+                  {nextJamaat.isNextDay && (
+                    <span className="ml-1 text-[11px] font-medium text-text-tertiary">tmrw</span>
+                  )}
                 </p>
                 <p className="font-mono text-[13px] font-medium text-text-tertiary">
                   {nextJamaat.time}

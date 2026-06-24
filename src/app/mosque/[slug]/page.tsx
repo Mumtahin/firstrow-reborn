@@ -204,6 +204,25 @@ export default async function MosqueDetailPage({
           )
         })()}
 
+        {/* All done for today banner */}
+        {isToday && allPassed && (
+          <div className="rounded-[18px] border border-card-border bg-white p-[18px]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-tertiary">
+              All done for today
+            </p>
+            {nextJamaat?.isNextDay ? (
+              <p className="mt-1 text-[15px] font-medium text-text-secondary">
+                Next up: <span className="font-semibold text-text-primary">Fajr</span> tomorrow at{' '}
+                <span className="font-mono font-semibold text-text-primary">{to12h(nextJamaat.time)}</span>
+              </p>
+            ) : (
+              <p className="mt-1 text-[14px] font-medium text-text-secondary">
+                No times available for tomorrow yet.
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Timetable */}
         <div>
           <div className="mb-[10px] flex items-center justify-between px-0.5">
