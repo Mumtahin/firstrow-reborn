@@ -38,7 +38,7 @@ export default function MosqueCard({
   userId,
 }: Props) {
   return (
-    <div className="relative rounded-2xl border border-[#EAEAEA] bg-white shadow-[0_1px_2px_rgba(17,17,17,0.04)] transition active:scale-[0.99]">
+    <div className="relative rounded-2xl border border-card-border bg-white shadow-card transition active:scale-[0.99]">
       {/* Tap target covering the whole card */}
       <Link href={`/mosque/${slug}`} className="absolute inset-0 z-0 rounded-2xl" aria-label={name} />
 
@@ -53,7 +53,7 @@ export default function MosqueCard({
           </div>
           <div className="flex shrink-0 items-center gap-1">
             {distance !== null && (
-              <span className="text-sm font-medium text-[#666]">
+              <span className="text-sm font-medium text-text-secondary">
                 {formatDistance(distance)}
               </span>
             )}

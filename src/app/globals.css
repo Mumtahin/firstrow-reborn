@@ -2,7 +2,7 @@
 
 :root {
   --background: #FAFAF8;
-  --foreground: #171717;
+  --foreground: #111;
 }
 
 @theme inline {
@@ -10,6 +10,30 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* App background */
+  --color-app-bg: #FAFAF8;
+
+  /* Card */
+  --color-card-border: #EAEAEA;
+  --color-card-border-fav: #DEDEDA;
+  --color-card-divider: #F0F0EE;
+
+  /* Text */
+  --color-text-primary: #111;
+  --color-text-secondary: #666;
+  --color-text-tertiary: #888;
+
+  /* UI borders */
+  --color-ui-border: #E6E6E2;
+
+  /* Urgency */
+  --color-urgent-go: #15803D;
+  --color-urgent-tight: #B45309;
+  --color-urgent-late: #DC2626;
+
+  /* Shadows */
+  --shadow-card: 0 1px 2px rgba(17,17,17,0.04);
 }
 
 
