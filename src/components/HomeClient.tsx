@@ -85,9 +85,6 @@ export default function HomeClient({ mosques, favouriteIds, userId }: Props) {
     }))
     .filter((m) => !selectedPrayer || m.nextJamaat !== null)
     .sort((a, b) => {
-      if (selectedPrayer) {
-        return (a.nextJamaat?.minutesUntil ?? 0) - (b.nextJamaat?.minutesUntil ?? 0)
-      }
       if (a.distance !== null && b.distance !== null) return a.distance - b.distance
       return 0
     })

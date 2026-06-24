@@ -10,6 +10,7 @@ import PhoneIcon from '@/components/icons/PhoneIcon'
 import GlobeIcon from '@/components/icons/GlobeIcon'
 import MailIcon from '@/components/icons/MailIcon'
 import ChevronRightIcon from '@/components/icons/ChevronRightIcon'
+import MosqueDetailMapClient from '@/components/MosqueDetailMapClient'
 
 const PRAYERS = [
   { key: 'fajr', label: 'Fajr' },
@@ -303,6 +304,11 @@ export default async function MosqueDetailPage({
           </div>
         </div>
 
+        {/* Map */}
+        {mosque.lat !== null && mosque.lng !== null && (
+          <MosqueDetailMapClient lat={mosque.lat} lng={mosque.lng} name={mosque.name} />
+        )}
+
         {/* Facilities */}
         {hasAmenities && (
           <div>
@@ -360,6 +366,7 @@ export default async function MosqueDetailPage({
             </div>
           </div>
         )}
+
 
       </div>
     </main>
