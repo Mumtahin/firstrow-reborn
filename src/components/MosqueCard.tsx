@@ -2,6 +2,9 @@ import Link from 'next/link'
 import { formatDistance } from '@/lib/utils/distance'
 import { estimateTravelMinutes } from '@/lib/utils/feasibility'
 import type { NextJamaatResult } from '@/lib/utils/getNextJamaat'
+import HeartIcon from '@/components/icons/HeartIcon'
+import NavigateIcon from '@/components/icons/NavigateIcon'
+
 type Props = {
   name: string
   slug: string
@@ -98,13 +101,11 @@ export default function MosqueCard({
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-[6px]">
-              <h2 className="whitespace-nowrap text-[18px] font-semibold leading-tight tracking-[-0.01em] text-text-primary">
+              <h2 className="truncate text-[18px] font-semibold leading-tight tracking-[-0.01em] text-text-primary">
                 {name}
               </h2>
               {isFavourited && (
-                <svg width="13" height="13" viewBox="0 0 15 15" fill="currentColor" className="shrink-0 text-text-tertiary">
-                  <path d="M7.5 12.5L2.5 7.5C1.5 6.5 1.5 4.5 3 3.5C4.5 2.5 6 3 7.5 5C9 3 10.5 2.5 12 3.5C13.5 4.5 13.5 6.5 12.5 7.5L7.5 12.5Z" />
-                </svg>
+                <HeartIcon filled className="h-[13px] w-[13px] shrink-0 text-text-tertiary" />
               )}
             </div>
             {distance !== null && (
@@ -114,19 +115,17 @@ export default function MosqueCard({
             )}
           </div>
 
-          {/* Directions button */}
+          {/* Directions icon button */}
           <div className="pointer-events-auto shrink-0">
             <a
               href={`https://maps.google.com/?q=${lat},${lng}`}
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-[6px] rounded-[12px] bg-text-primary px-[14px] py-[8px] text-[14px] font-semibold text-white"
+              aria-label="Directions"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-text-primary text-white"
             >
-              Directions
-              <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 7.5H12M12 7.5L8.5 4M12 7.5L8.5 11" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              <NavigateIcon className="h-[17px] w-[17px]" />
             </a>
           </div>
         </div>

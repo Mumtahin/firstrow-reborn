@@ -5,9 +5,12 @@ import { getMosqueBySlug, getFavouriteIds } from '@/lib/db/queries'
 import { getNextJamaat } from '@/lib/utils/getNextJamaat'
 import FavouriteButton from '@/components/FavouriteButton'
 import ChevronLeftIcon from '@/components/icons/ChevronLeftIcon'
-import MapPinIcon from '@/components/icons/MapPinIcon'
+import NavigateIcon from '@/components/icons/NavigateIcon'
+import PhoneIcon from '@/components/icons/PhoneIcon'
+import GlobeIcon from '@/components/icons/GlobeIcon'
+import MailIcon from '@/components/icons/MailIcon'
+import ChevronRightIcon from '@/components/icons/ChevronRightIcon'
 
-// Helpers
 const PRAYERS = [
   { key: 'fajr', label: 'Fajr' },
   { key: 'zuhr', label: 'Zuhr' },
@@ -18,7 +21,11 @@ const PRAYERS = [
 
 type PrayerKey = (typeof PRAYERS)[number]['key']
 
-function to12h(time: string | null): string {
+const PRAYER_LABELS: Record<string, string> = {
+  fajr: 'Fajr', zuhr: 'Zuhr', asr: 'Asr', maghrib: 'Maghrib', isha: 'Isha',
+}
+
+function to12h(time: string | null | undefined): string {
   if (!time) return '—'
   const [h, m] = time.split(':').map(Number)
   const period = h < 12 ? 'am' : 'pm'
@@ -26,18 +33,10 @@ function to12h(time: string | null): string {
   return `${hour}:${m.toString().padStart(2, '0')}${period}`
 }
 
-function ordinal(n: number): string {
-  const s = ['th', 'st', 'nd', 'rd']
-  const v = n % 100
-  return n + (s[(v - 20) % 10] ?? s[v] ?? s[0])
-}
-
-function formatDateHeading(dateStr: string): string {
+function formatDateBadge(dateStr: string): string {
   const [y, mo, d] = dateStr.split('-').map(Number)
   const date = new Date(Date.UTC(y, mo - 1, d))
-  const weekday = date.toLocaleDateString('en-GB', { weekday: 'long', timeZone: 'UTC' })
-  const month = date.toLocaleDateString('en-GB', { month: 'long', timeZone: 'UTC' })
-  return `${weekday} ${ordinal(d)} ${month}`
+  return date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' })
 }
 
 function shiftDate(dateStr: string, days: number): string {
@@ -47,8 +46,22 @@ function shiftDate(dateStr: string, days: number): string {
 }
 
 function todayUK(): string {
-  return new Date()
-    .toLocaleDateString('en-CA', { timeZone: 'Europe/London' }) // 'YYYY-MM-DD'
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/London' })
+}
+
+function countdownHero(minutes: number): { value: string; unit: string } {
+  if (minutes < 60) return { value: String(minutes), unit: 'min' }
+  const h = Math.floor(minutes / 60)
+  const m = minutes % 60
+  if (m === 0) return { value: String(h), unit: 'h' }
+  return { value: `${h}h ${m}`, unit: 'm' }
+}
+
+function countdownBadge(minutes: number): string {
+  if (minutes < 60) return `${minutes} min`
+  const h = Math.floor(minutes / 60)
+  const m = minutes % 60
+  return m === 0 ? `${h}h` : `${h}h ${m}m`
 }
 
 type RowState = 'past' | 'current' | 'upcoming'
@@ -68,13 +81,6 @@ function getPrayerRowState(
   return 'upcoming'
 }
 
-const rowStyles: Record<RowState, string> = {
-  past: 'text-gray-400',
-  current: 'bg-amber-100 font-medium text-gray-900',
-  upcoming: 'bg-stone-50 text-gray-700',
-}
-
-// Page
 export default async function MosqueDetailPage({
   params,
   searchParams,
@@ -88,10 +94,7 @@ export default async function MosqueDetailPage({
   const date = dateParam ?? today
   const isToday = date === today
 
-  const [mosque, session] = await Promise.all([
-    getMosqueBySlug(slug, date),
-    auth(),
-  ])
+  const [mosque, session] = await Promise.all([getMosqueBySlug(slug, date), auth()])
   if (!mosque) notFound()
 
   const userId = session?.user?.id ?? null
@@ -102,156 +105,235 @@ export default async function MosqueDetailPage({
   const nextJamaat = isToday ? getNextJamaat(mosque, now) : null
   const allPassed = isToday && (nextJamaat === null || nextJamaat.isNextDay)
   const nextPrayer = nextJamaat && !nextJamaat.isNextDay ? nextJamaat.prayer : null
+  const showHero = isToday && nextJamaat && !nextJamaat.isNextDay
 
   const prevDate = shiftDate(date, -1)
   const nextDate = shiftDate(date, 1)
 
+  const hasAmenities = mosque.hasWomensSpace || mosque.hasCarPark || mosque.hasDisabilityAccess
+  const hasContact = mosque.website || mosque.phone || mosque.email
+
   return (
-    <main className="mx-auto max-w-lg px-4 py-6">
-      {/* Back */}
-      <Link href="/" className="mb-6 flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800">
-        <ChevronLeftIcon className="h-4 w-4" />
-        Back
-      </Link>
+    <main className="mx-auto w-full max-w-lg">
 
-      {/* Heading */}
-      <div className="flex items-start justify-between gap-3">
-        <h1 className="text-2xl font-bold text-gray-900">{mosque.name}</h1>
-        <FavouriteButton mosqueId={mosque.id} isFavourited={isFavourited} userId={userId} />
-      </div>
-      {mosque.addressLine1 && (
-        <p className="mt-1 text-sm text-gray-500">
-          {mosque.addressLine1}{mosque.addressLine2 ? `, ${mosque.addressLine2}` : ''},{' '}
-          {mosque.town}, {mosque.postcode}
-        </p>
-      )}
-
-      {mosque.lat && mosque.lng && (
-        <a
-          href={`https://maps.google.com/?q=${mosque.lat},${mosque.lng}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600"
+      {/* Nav bar */}
+      <div className="flex items-center justify-between px-4 pb-[14px] pt-10">
+        <Link
+          href="/"
+          aria-label="Back"
+          className="flex h-[38px] w-[38px] items-center justify-center rounded-full border border-card-border bg-white"
         >
-          <MapPinIcon className="h-3.5 w-3.5" />
-          Open in Maps
-        </a>
-      )}
+          <ChevronLeftIcon className="h-[15px] w-[15px] text-[#333]" />
+        </Link>
+        <FavouriteButton
+          mosqueId={mosque.id}
+          isFavourited={isFavourited}
+          userId={userId}
+          className="h-[38px] w-[38px] rounded-full border border-card-border bg-white"
+        />
+      </div>
 
-      {/* Amenities */}
-      {(mosque.hasWomensSpace || mosque.hasCarPark || mosque.hasDisabilityAccess) && (
-        <div className="mt-4 flex gap-2">
-          {mosque.hasWomensSpace && (
-            <span title="Women's space" className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 text-lg">🧕</span>
-          )}
-          {mosque.hasCarPark && (
-            <span title="Car park" className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 text-lg">🅿️</span>
-          )}
-          {mosque.hasDisabilityAccess && (
-            <span title="Disability access" className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 text-lg">♿</span>
+      <div className="flex flex-col gap-[18px] px-4 pb-7">
+
+        {/* Identity */}
+        <div>
+          <h1 className="text-[26px] font-bold leading-tight tracking-[-0.02em] text-text-primary">
+            {mosque.name}
+          </h1>
+          {mosque.addressLine1 && (
+            <p className="mt-[6px] text-[14px] font-medium text-text-secondary">
+              {mosque.addressLine1}{mosque.addressLine2 ? `, ${mosque.addressLine2}` : ''},{' '}
+              {mosque.town}, {mosque.postcode}
+            </p>
           )}
         </div>
-      )}
 
-      {/* Date navigation */}
-      <div className="mt-6 flex items-center justify-between">
-        <Link
-          href={`/mosque/${slug}?date=${prevDate}`}
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50"
-          aria-label="Previous day"
-        >
-          ‹
-        </Link>
-        <span className="text-sm font-medium text-gray-700">
-          {isToday ? 'Today' : formatDateHeading(date)}
-        </span>
-        <Link
-          href={`/mosque/${slug}?date=${nextDate}`}
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50"
-          aria-label="Next day"
-        >
-          ›
-        </Link>
-      </div>
+        {/* Hero card */}
+        {showHero && (() => {
+          const { value, unit } = countdownHero(nextJamaat.minutesUntil)
+          const colour =
+            nextJamaat.minutesUntil >= 18 ? 'text-urgent-go'
+            : nextJamaat.minutesUntil >= 5 ? 'text-urgent-tight'
+            : 'text-urgent-late'
+          return (
+            <div className="flex flex-col gap-4 rounded-[18px] border border-card-border bg-white p-[18px] shadow-card">
+              <div className="flex items-end justify-between">
+                <div>
+                  <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-text-tertiary">
+                    Next jamaat starts in
+                  </p>
+                  <div className="flex items-baseline">
+                    <span className={`font-mono text-[52px] font-bold leading-[0.9] tracking-[-0.03em] ${colour}`}>
+                      {value}
+                    </span>
+                    <span className={`ml-[7px] text-[20px] font-semibold ${colour}`}>
+                      {unit}
+                    </span>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-[14px] font-semibold text-text-primary">
+                    {PRAYER_LABELS[nextJamaat.prayer]}
+                  </p>
+                  <p className="font-mono text-[14px] font-medium text-text-tertiary">
+                    {to12h(nextJamaat.time)}
+                  </p>
+                </div>
+              </div>
+              {mosque.lat && mosque.lng && (
+                <a
+                  href={`https://maps.google.com/?q=${mosque.lat},${mosque.lng}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex w-full items-center justify-center gap-2 rounded-[14px] bg-text-primary py-[15px] text-[16px] font-semibold text-white"
+                >
+                  Directions
+                  <NavigateIcon className="h-[17px] w-[17px]" />
+                </a>
+              )}
+            </div>
+          )
+        })()}
 
-      {/* Prayer timetable */}
-      <div className="mt-3 overflow-hidden rounded-xl border border-gray-200">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-gray-200 bg-gray-50 text-xs font-medium uppercase tracking-wide text-gray-400">
-              <th className="px-4 py-2 text-left">Prayer</th>
-              <th className="px-4 py-2 text-right">Start</th>
-              <th className="px-4 py-2 text-right">Jamaat</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
+        {/* Timetable */}
+        <div>
+          <div className="mb-[10px] flex items-center justify-between px-0.5">
+            <span className="text-[12px] font-bold uppercase tracking-[0.07em] text-text-tertiary">
+              {isToday ? "Today's jamaats" : 'Jamaats'}
+            </span>
+            <div className="flex items-center gap-3">
+              <Link
+                href={`/mosque/${slug}?date=${prevDate}`}
+                aria-label="Previous day"
+                className="text-[16px] leading-none text-text-tertiary hover:text-text-secondary"
+              >
+                ‹
+              </Link>
+              <span className="text-[12px] font-medium text-[#A0A09A]">
+                {formatDateBadge(date)}
+              </span>
+              <Link
+                href={`/mosque/${slug}?date=${nextDate}`}
+                aria-label="Next day"
+                className="text-[16px] leading-none text-text-tertiary hover:text-text-secondary"
+              >
+                ›
+              </Link>
+            </div>
+          </div>
+
+          <div className="overflow-hidden rounded-2xl border border-card-border bg-white divide-y divide-[#F3F3F0]">
             {PRAYERS.map(({ key, label }) => {
-              const hasTimes = mosque[`${key}Start`] || mosque[`${key}Jamaat`]
-              if (!hasTimes && !isToday) return null
+              const jamaatTime = mosque[`${key}Jamaat` as keyof typeof mosque] as string | null
+              const startTime = mosque[`${key}Start` as keyof typeof mosque] as string | null
+              if (!jamaatTime && !startTime && !isToday) return null
 
-              const state = isToday
-                ? getPrayerRowState(key, nextPrayer, allPassed)
-                : 'upcoming'
+              const state = isToday ? getPrayerRowState(key, nextPrayer, allPassed) : 'upcoming'
+
+              const rowBg = state === 'current' ? 'bg-[rgba(22,163,74,0.06)]' : ''
+              const nameClass =
+                state === 'past' ? 'text-[15px] font-medium text-text-secondary'
+                : state === 'current' ? 'text-[16px] font-bold text-urgent-go'
+                : 'text-[15px] font-medium text-text-primary'
+              const timeClass =
+                state === 'past' ? 'text-[15px] font-medium text-text-secondary'
+                : state === 'current' ? 'text-[16px] font-bold text-urgent-go'
+                : 'text-[15px] font-medium text-[#333]'
 
               return (
-                <tr key={key} className={rowStyles[state]}>
-                  <td className="px-4 py-3 font-medium">{label}</td>
-                  <td className="px-4 py-3 text-right">
-                    {to12h(mosque[`${key}Start`])}
-                    {key === 'asr' && mosque.asrAltStart && (
-                      <span className="ml-1 text-xs text-gray-400">
-                        / {to12h(mosque.asrAltStart)}
+                <div key={key} className={`flex items-center justify-between px-4 py-[13px] ${rowBg}`}>
+                  <div className="flex items-center gap-2.5">
+                    <span className={nameClass}>{label}</span>
+                    {state === 'current' && nextJamaat && (
+                      <span className="rounded-full bg-[rgba(22,163,74,0.12)] px-[7px] py-[2px] text-[11px] font-semibold uppercase tracking-[0.05em] text-urgent-go">
+                        In {countdownBadge(nextJamaat.minutesUntil)}
                       </span>
                     )}
-                  </td>
-                  <td className="px-4 py-3 text-right">{to12h(mosque[`${key}Jamaat`])}</td>
-                </tr>
+                  </div>
+                  <div className="text-right">
+                    <p className={`font-mono ${timeClass}`}>
+                      {to12h(jamaatTime)}
+                    </p>
+                    {startTime && (
+                      <p className="font-mono text-[12px] text-text-tertiary">
+                        starts {to12h(startTime)}
+                        {key === 'asr' && mosque.asrAltStart && (
+                          <> / {to12h(mosque.asrAltStart)}</>
+                        )}
+                      </p>
+                    )}
+                  </div>
+                </div>
               )
             })}
-          </tbody>
-        </table>
 
-        {!mosque.fajrJamaat && !mosque.zuhrJamaat && !mosque.asrJamaat && !mosque.maghribJamaat && !mosque.ishaJamaat && (
-          <p className="px-4 py-6 text-center text-sm text-gray-400">
-            No prayer times available for this date.
-          </p>
-        )}
-      </div>
-
-      {/* Contact info */}
-      {(mosque.website || mosque.phone || mosque.email) && (
-        <div className="mt-6 flex flex-col gap-3">
-          {mosque.website && (
-            <a
-              href={mosque.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 text-sm text-gray-600 hover:text-gray-900"
-            >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100">🌐</span>
-              {mosque.website.replace(/^https?:\/\//, '')}
-            </a>
-          )}
-          {mosque.phone && (
-            <a
-              href={`tel:${mosque.phone}`}
-              className="flex items-center gap-3 text-sm text-gray-600 hover:text-gray-900"
-            >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100">📞</span>
-              {mosque.phone}
-            </a>
-          )}
-          {mosque.email && (
-            <a
-              href={`mailto:${mosque.email}`}
-              className="flex items-center gap-3 text-sm text-gray-600 hover:text-gray-900"
-            >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100">✉️</span>
-              {mosque.email}
-            </a>
-          )}
+            {!mosque.fajrJamaat && !mosque.zuhrJamaat && !mosque.asrJamaat && !mosque.maghribJamaat && !mosque.ishaJamaat && (
+              <p className="px-4 py-6 text-center text-[13px] text-text-tertiary">
+                No prayer times available for this date.
+              </p>
+            )}
+          </div>
         </div>
-      )}
+
+        {/* Facilities */}
+        {hasAmenities && (
+          <div>
+            <p className="mb-[10px] px-0.5 text-[12px] font-bold uppercase tracking-[0.07em] text-text-tertiary">
+              Facilities
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {mosque.hasWomensSpace && (
+                <span className="rounded-full border border-card-border bg-white px-[13px] py-[7px] text-[13px] font-medium text-[#444]">
+                  Women&apos;s section
+                </span>
+              )}
+              {mosque.hasCarPark && (
+                <span className="rounded-full border border-card-border bg-white px-[13px] py-[7px] text-[13px] font-medium text-[#444]">
+                  Parking
+                </span>
+              )}
+              {mosque.hasDisabilityAccess && (
+                <span className="rounded-full border border-card-border bg-white px-[13px] py-[7px] text-[13px] font-medium text-[#444]">
+                  Wheelchair access
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Contact */}
+        {hasContact && (
+          <div>
+            <p className="mb-[10px] px-0.5 text-[12px] font-bold uppercase tracking-[0.07em] text-text-tertiary">
+              Contact
+            </p>
+            <div className="overflow-hidden rounded-2xl border border-card-border bg-white divide-y divide-[#F3F3F0]">
+              {mosque.phone && (
+                <a href={`tel:${mosque.phone}`} className="flex items-center gap-3 px-4 py-[13px]">
+                  <PhoneIcon className="h-[17px] w-[17px] text-[#666]" />
+                  <span className="flex-1 text-[15px] font-medium text-text-primary">{mosque.phone}</span>
+                  <ChevronRightIcon className="h-[13px] w-[8px] text-[#C8C8C2]" />
+                </a>
+              )}
+              {mosque.website && (
+                <a href={mosque.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-4 py-[13px]">
+                  <GlobeIcon className="h-[17px] w-[17px] text-[#666]" />
+                  <span className="flex-1 text-[15px] font-medium text-text-primary">{mosque.website.replace(/^https?:\/\//, '')}</span>
+                  <ChevronRightIcon className="h-[13px] w-[8px] text-[#C8C8C2]" />
+                </a>
+              )}
+              {mosque.email && (
+                <a href={`mailto:${mosque.email}`} className="flex items-center gap-3 px-4 py-[13px]">
+                  <MailIcon className="h-[17px] w-[17px] text-[#666]" />
+                  <span className="flex-1 text-[15px] font-medium text-text-primary">{mosque.email}</span>
+                  <ChevronRightIcon className="h-[13px] w-[8px] text-[#C8C8C2]" />
+                </a>
+              )}
+            </div>
+          </div>
+        )}
+
+      </div>
     </main>
   )
 }

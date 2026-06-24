@@ -6,6 +6,8 @@ import { haversineDistance } from '@/lib/utils/distance'
 import { getNextJamaat } from '@/lib/utils/getNextJamaat'
 import type { MosqueWithTimes } from '@/lib/db/queries'
 import MosqueCard from './MosqueCard'
+import HeartIcon from './icons/HeartIcon'
+import MapPinIcon from './icons/MapPinIcon'
 
 const MosqueMap = dynamic(() => import('./MosqueMap'), { ssr: false })
 
@@ -91,9 +93,7 @@ export default function HomeClient({ mosques, favouriteIds, userId }: Props) {
         {userId && (
           <div className="flex flex-col gap-[10px]">
             <div className="flex items-center gap-[7px] px-0.5">
-              <svg width="13" height="13" viewBox="0 0 15 15" fill="currentColor" className="text-text-tertiary">
-                <path d="M7.5 12.5L2.5 7.5C1.5 6.5 1.5 4.5 3 3.5C4.5 2.5 6 3 7.5 5C9 3 10.5 2.5 12 3.5C13.5 4.5 13.5 6.5 12.5 7.5L7.5 12.5Z" />
-              </svg>
+              <HeartIcon filled className="h-[13px] w-[13px] text-text-tertiary" />
               <span className="text-[12px] font-bold uppercase tracking-[0.05em] text-text-tertiary">
                 Favourites
               </span>
@@ -123,10 +123,7 @@ export default function HomeClient({ mosques, favouriteIds, userId }: Props) {
         <div className="flex flex-col gap-[10px]">
           {userId && nearby.length > 0 && (
             <div className="flex items-center gap-[7px] px-0.5">
-              <svg width="11" height="13" viewBox="0 0 11 14" fill="none" stroke="currentColor" strokeWidth="1.4" className="text-text-tertiary">
-                <path d="M5.5 1C3 1 1 3 1 5.5C1 9 5.5 13 5.5 13C5.5 13 10 9 10 5.5C10 3 8 1 5.5 1Z" />
-                <circle cx="5.5" cy="5.5" r="1.5" fill="currentColor" stroke="none" />
-              </svg>
+              <MapPinIcon className="h-[13px] w-[13px] text-text-tertiary" />
               <span className="text-[12px] font-bold uppercase tracking-[0.05em] text-text-tertiary">
                 Nearby
               </span>

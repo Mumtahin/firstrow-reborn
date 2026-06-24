@@ -23,8 +23,8 @@ export default async function HomePage() {
   const favouriteIds = userId ? Array.from(await getFavouriteIds(userId)) : []
 
   return (
-    <main className="mx-auto max-w-lg">
-      <div className="flex items-center justify-between px-5 pb-[14px] pt-10">
+    <main className="mx-auto w-full max-w-lg">
+      <div className="flex items-center justify-between px-4 pb-[14px] pt-10">
         <div className="flex items-center gap-2">
           <Image
             src="/apple-touch-icon.png"

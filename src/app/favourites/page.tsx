@@ -22,7 +22,7 @@ export default async function FavouritesPage() {
   const now = new Date()
 
   return (
-    <main className="mx-auto max-w-lg px-4 py-6">
+    <main className="mx-auto w-full max-w-lg px-4 py-6">
       <Link
         href="/"
         className="mb-6 flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800"
