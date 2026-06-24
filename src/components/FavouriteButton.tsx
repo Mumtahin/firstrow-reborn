@@ -3,7 +3,7 @@
 import { useOptimistic, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toggleFavourite } from '@/app/actions'
-import HeartIcon from '@/components/icons/HeartIcon'
+import StarIcon from '@/components/icons/StarIcon'
 
 type Props = {
   mosqueId: number
@@ -38,7 +38,7 @@ export default function FavouriteButton({ mosqueId, isFavourited, userId, classN
       aria-label={optimisticFav ? 'Remove from favourites' : 'Add to favourites'}
       className={`flex items-center justify-center transition hover:scale-110 active:scale-95 ${className ?? ''}`}
     >
-      <HeartIcon filled={optimisticFav} className="h-[15px] w-[15px] text-text-tertiary" />
+      <StarIcon filled={optimisticFav} className="h-[15px] w-[15px] text-text-tertiary" />
     </button>
   )
 }

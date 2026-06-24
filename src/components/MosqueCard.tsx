@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { formatDistance } from '@/lib/utils/distance'
 import { estimateTravelMinutes } from '@/lib/utils/feasibility'
 import type { NextJamaatResult } from '@/lib/utils/getNextJamaat'
-import HeartIcon from '@/components/icons/HeartIcon'
+import StarIcon from '@/components/icons/StarIcon'
 import NavigateIcon from '@/components/icons/NavigateIcon'
 
 type Props = {
@@ -105,7 +105,7 @@ export default function MosqueCard({
                 {name}
               </h2>
               {isFavourited && (
-                <HeartIcon filled className="h-[13px] w-[13px] shrink-0 text-text-tertiary" />
+                <StarIcon filled className="h-[13px] w-[13px] shrink-0 text-text-tertiary" />
               )}
             </div>
             {distance !== null && (

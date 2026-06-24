@@ -6,7 +6,7 @@ import { haversineDistance } from '@/lib/utils/distance'
 import { getNextJamaat } from '@/lib/utils/getNextJamaat'
 import type { MosqueWithTimes } from '@/lib/db/queries'
 import MosqueCard from './MosqueCard'
-import HeartIcon from './icons/HeartIcon'
+import StarIcon from './icons/StarIcon'
 import MapPinIcon from './icons/MapPinIcon'
 
 const MosqueMap = dynamic(() => import('./MosqueMap'), { ssr: false })
@@ -93,7 +93,7 @@ export default function HomeClient({ mosques, favouriteIds, userId }: Props) {
         {userId && (
           <div className="flex flex-col gap-[10px]">
             <div className="flex items-center gap-[7px] px-0.5">
-              <HeartIcon filled className="h-[13px] w-[13px] text-text-tertiary" />
+              <StarIcon filled className="h-[13px] w-[13px] text-text-tertiary" />
               <span className="text-[12px] font-bold uppercase tracking-[0.05em] text-text-tertiary">
                 Favourites
               </span>
@@ -113,7 +113,7 @@ export default function HomeClient({ mosques, favouriteIds, userId }: Props) {
               ))
             ) : (
               <p className="px-0.5 text-[13px] font-medium text-text-tertiary">
-                Tap ♡ on a mosque to save it here.
+                Tap ☆ on a mosque to save it here.
               </p>
             )}
           </div>
