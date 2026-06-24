@@ -89,8 +89,8 @@ export default function HomeClient({ mosques, favouriteIds, userId }: Props) {
       {/* Sections */}
       <div className="flex flex-col gap-[22px] px-4 pb-7 pt-1">
 
-        {/* Favourites section — only shown when signed in */}
-        {userId && (
+        {/* Favourites section — only shown when signed in and has favourites */}
+        {userId && favourites.length > 0 && (
           <div className="flex flex-col gap-[10px]">
             <div className="flex items-center gap-[7px] px-0.5">
               <StarIcon filled className="h-[13px] w-[13px] text-text-tertiary" />
@@ -98,30 +98,24 @@ export default function HomeClient({ mosques, favouriteIds, userId }: Props) {
                 Favourites
               </span>
             </div>
-            {favourites.length > 0 ? (
-              favourites.map((m) => (
-                <MosqueCard
-                  key={m.id}
-                  name={m.name}
-                  slug={m.slug}
-                  lat={m.lat}
-                  lng={m.lng}
-                  distance={m.distance}
-                  nextJamaat={m.nextJamaat}
-                  isFavourited={true}
-                />
-              ))
-            ) : (
-              <p className="px-0.5 text-[13px] font-medium text-text-tertiary">
-                Tap ☆ on a mosque to save it here.
-              </p>
-            )}
+            {favourites.map((m) => (
+              <MosqueCard
+                key={m.id}
+                name={m.name}
+                slug={m.slug}
+                lat={m.lat}
+                lng={m.lng}
+                distance={m.distance}
+                nextJamaat={m.nextJamaat}
+                isFavourited={true}
+              />
+            ))}
           </div>
         )}
 
         {/* Nearby section */}
         <div className="flex flex-col gap-[10px]">
-          {userId && nearby.length > 0 && (
+          {userId && favourites.length > 0 && nearby.length > 0 && (
             <div className="flex items-center gap-[7px] px-0.5">
               <MapPinIcon className="h-[13px] w-[13px] text-text-tertiary" />
               <span className="text-[12px] font-bold uppercase tracking-[0.05em] text-text-tertiary">
