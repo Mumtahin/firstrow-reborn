@@ -34,9 +34,19 @@ export default function FavouriteButton({ mosqueId, isFavourited, userId }: Prop
     <button
       onClick={handleClick}
       aria-label={optimisticFav ? 'Remove from favourites' : 'Add to favourites'}
-      className="flex h-8 w-8 items-center justify-center rounded-full text-lg transition hover:scale-110 active:scale-95"
+      className="flex items-center justify-center transition hover:scale-110 active:scale-95"
     >
-      {optimisticFav ? '♥' : '♡'}
+      <svg
+        width="15"
+        height="15"
+        viewBox="0 0 15 15"
+        fill={optimisticFav ? 'currentColor' : 'none'}
+        stroke="currentColor"
+        strokeWidth="1.5"
+        className={optimisticFav ? 'text-text-tertiary' : 'text-text-tertiary'}
+      >
+        <path d="M7.5 12.5L2.5 7.5C1.5 6.5 1.5 4.5 3 3.5C4.5 2.5 6 3 7.5 5C9 3 10.5 2.5 12 3.5C13.5 4.5 13.5 6.5 12.5 7.5L7.5 12.5Z" />
+      </svg>
     </button>
   )
 }

@@ -45,16 +45,16 @@ export default async function FavouritesPage() {
           {mosques.map((m) => (
             <MosqueCard
               key={m.id}
-              id={m.id}
               name={m.name}
               slug={m.slug}
+              lat={m.lat}
+              lng={m.lng}
               addressLine1={m.addressLine1}
               town={m.town}
               postcode={m.postcode}
               distance={null}
               nextJamaat={getNextJamaat(m, now, m.tomorrowFajrJamaat)}
               isFavourited={favouriteIds.has(m.id)}
-              userId={userId}
             />
           ))}
         </div>
