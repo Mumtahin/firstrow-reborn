@@ -23,7 +23,7 @@ export default function MosqueMap({ mosques, userLat, userLng }: Props) {
   }, [userLat, userLng])
 
   return (
-    <div className="relative h-64 w-full overflow-hidden rounded-xl">
+    <div className="relative h-48 w-full overflow-hidden rounded-xl">
       <Map
         ref={mapRef}
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
