@@ -23,20 +23,17 @@ export default async function HomePage() {
   const favouriteIds = userId ? Array.from(await getFavouriteIds(userId)) : []
 
   return (
-    <main className="mx-auto max-w-lg px-4 py-6">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <Image
-              src="/apple-touch-icon.png"
-              alt="FirstRow"
-              width={28}
-              height={28}
-              className="rounded-lg"
-            />
-            <h1 className="text-2xl font-bold text-gray-900">FirstRow</h1>
-          </div>
-          {/* <p className="text-sm text-gray-500">Find your next jamaat nearby</p> */}
+    <main className="mx-auto max-w-lg">
+      <div className="flex items-center justify-between px-5 pb-[14px] pt-10">
+        <div className="flex items-center gap-2">
+          <Image
+            src="/apple-touch-icon.png"
+            alt="FirstRow"
+            width={28}
+            height={28}
+            className="rounded-lg"
+          />
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-text-primary">FirstRow</h1>
         </div>
         <AuthButton />
       </div>

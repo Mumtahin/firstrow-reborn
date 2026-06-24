@@ -38,13 +38,12 @@ export default function HomeClient({ mosques, favouriteIds, userId }: Props) {
     )
   }, [])
 
-  // Update countdowns every minute
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 60_000)
     return () => clearInterval(id)
   }, [])
 
-  const sortedMosques =
+  const enriched =
     location.status === 'granted'
       ? mosques
           .map((m) => ({
@@ -55,43 +54,98 @@ export default function HomeClient({ mosques, favouriteIds, userId }: Props) {
           .sort((a, b) => a.distance - b.distance)
       : mosques.map((m) => ({ ...m, distance: null, nextJamaat: getNextJamaat(m, now, m.tomorrowFajrJamaat) }))
 
+  const favourites = enriched.filter((m) => favSet.has(m.id))
+  const nearby = enriched.filter((m) => !favSet.has(m.id))
+
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col">
+      {/* Map / location states */}
       {location.status === 'pending' && (
-        <div className="flex h-64 w-full items-center justify-center rounded-xl bg-gray-100">
-          <div className="h-7 w-7 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
+        <div className="mx-4 mb-4 flex h-48 items-center justify-center rounded-2xl bg-card-divider">
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-card-border-fav border-t-text-tertiary" />
         </div>
       )}
-
       {location.status === 'granted' && (
-        <MosqueMap mosques={mosques} userLat={location.lat} userLng={location.lng} />
+        <div className="mb-4 px-4">
+          <MosqueMap mosques={mosques} userLat={location.lat} userLng={location.lng} />
+        </div>
       )}
-
       {(location.status === 'denied' || location.status === 'unavailable') && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-          <p className="font-medium">Location access needed</p>
-          <p className="mt-1 text-amber-700">
-            Allow location access to see nearby mosques and the map.
+        <div className="mx-4 mb-4 rounded-2xl border border-card-border bg-white px-4 py-3">
+          <p className="text-[13px] font-semibold text-text-primary">Location access needed</p>
+          <p className="mt-0.5 text-[13px] font-medium text-text-secondary">
+            Allow location access to sort by proximity.
           </p>
         </div>
       )}
 
-      <div className="flex flex-col gap-3">
-        <h2 className="text-sm tracking-wide text-gray-400">
-          {location.status === 'granted' ? 'Nearest mosques' : 'All mosques'}
-        </h2>
-        {sortedMosques.map((m) => (
-          <MosqueCard
-            key={m.id}
-            name={m.name}
-            slug={m.slug}
-            lat={m.lat}
-            lng={m.lng}
-            distance={m.distance}
-            nextJamaat={m.nextJamaat}
-            isFavourited={favSet.has(m.id)}
-          />
-        ))}
+      {/* Helper text */}
+      <p className="px-4 pb-3 text-[13px] font-medium text-text-tertiary">
+        {location.status === 'granted' ? 'Nearest jamaats first' : 'All mosques'}
+      </p>
+
+      {/* Sections */}
+      <div className="flex flex-col gap-[22px] px-4 pb-7 pt-1">
+
+        {/* Favourites section — only shown when signed in */}
+        {userId && (
+          <div className="flex flex-col gap-[10px]">
+            <div className="flex items-center gap-[7px] px-0.5">
+              <svg width="13" height="13" viewBox="0 0 15 15" fill="currentColor" className="text-text-tertiary">
+                <path d="M7.5 12.5L2.5 7.5C1.5 6.5 1.5 4.5 3 3.5C4.5 2.5 6 3 7.5 5C9 3 10.5 2.5 12 3.5C13.5 4.5 13.5 6.5 12.5 7.5L7.5 12.5Z" />
+              </svg>
+              <span className="text-[12px] font-bold uppercase tracking-[0.05em] text-text-tertiary">
+                Favourites
+              </span>
+            </div>
+            {favourites.length > 0 ? (
+              favourites.map((m) => (
+                <MosqueCard
+                  key={m.id}
+                  name={m.name}
+                  slug={m.slug}
+                  lat={m.lat}
+                  lng={m.lng}
+                  distance={m.distance}
+                  nextJamaat={m.nextJamaat}
+                  isFavourited={true}
+                />
+              ))
+            ) : (
+              <p className="px-0.5 text-[13px] font-medium text-text-tertiary">
+                Tap ♡ on a mosque to save it here.
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Nearby section */}
+        <div className="flex flex-col gap-[10px]">
+          {userId && nearby.length > 0 && (
+            <div className="flex items-center gap-[7px] px-0.5">
+              <svg width="11" height="13" viewBox="0 0 11 14" fill="none" stroke="currentColor" strokeWidth="1.4" className="text-text-tertiary">
+                <path d="M5.5 1C3 1 1 3 1 5.5C1 9 5.5 13 5.5 13C5.5 13 10 9 10 5.5C10 3 8 1 5.5 1Z" />
+                <circle cx="5.5" cy="5.5" r="1.5" fill="currentColor" stroke="none" />
+              </svg>
+              <span className="text-[12px] font-bold uppercase tracking-[0.05em] text-text-tertiary">
+                Nearby
+              </span>
+            </div>
+          )}
+          {nearby.map((m) => (
+            <MosqueCard
+              key={m.id}
+              name={m.name}
+              slug={m.slug}
+              lat={m.lat}
+              lng={m.lng}
+              distance={m.distance}
+              nextJamaat={m.nextJamaat}
+              isFavourited={false}
+            />
+          ))}
+        </div>
+
       </div>
     </div>
   )
