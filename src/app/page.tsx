@@ -1,7 +1,6 @@
-import Image from 'next/image'
 import { getMosquesWithPrayerTimes, getFavouriteIds } from '@/lib/db/queries'
 import HomeClient from '@/components/HomeClient'
-import AuthButton from '@/components/AuthButton'
+import HomeHeader from '@/components/HomeHeader'
 import { auth } from '@/auth'
 
 function dateString(daysFromNow: number): string {
@@ -24,19 +23,7 @@ export default async function HomePage() {
 
   return (
     <main className="mx-auto w-full max-w-lg">
-      <div className="flex items-center justify-between px-4 pb-[14px] pt-10">
-        <div className="flex items-center gap-2">
-          <Image
-            src="/apple-touch-icon.png"
-            alt="FirstRow"
-            width={28}
-            height={28}
-            className="rounded-lg"
-          />
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-text-primary">FirstRow</h1>
-        </div>
-        <AuthButton />
-      </div>
+      <HomeHeader userId={userId} userName={session?.user?.name ?? null} userImage={session?.user?.image ?? null} />
       <HomeClient mosques={mosques} favouriteIds={favouriteIds} userId={userId} />
     </main>
   )
