@@ -87,9 +87,6 @@ export default function HomeClient({ mosques, favouriteIds, userId }: Props) {
             slug={m.slug}
             lat={m.lat}
             lng={m.lng}
-            addressLine1={m.addressLine1}
-            town={m.town}
-            postcode={m.postcode}
             distance={m.distance}
             nextJamaat={m.nextJamaat}
             isFavourited={favSet.has(m.id)}
