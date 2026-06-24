@@ -25,20 +25,18 @@ const PRAYER_LABELS: Record<string, string> = {
   isha: 'Isha',
 }
 
-function countdownDisplay(minutes: number): { value: string; unit: string } {
-  if (minutes < 60) return { value: String(minutes), unit: 'min' }
-  const h = Math.floor(minutes / 60)
-  const m = minutes % 60
-  if (m === 0) return { value: String(h), unit: 'h' }
-  return { value: `${h}h ${m}`, unit: 'm' }
+function formatTime(time: string): { display: string; ampm: string } {
+  const [h, m] = time.split(':').map(Number)
+  const ampm = h >= 12 ? 'PM' : 'AM'
+  const h12 = h % 12 || 12
+  return { display: `${h12}:${String(m).padStart(2, '0')}`, ampm }
 }
 
-function urgencyColour(minutes: number, isNextDay: boolean, justStarted?: boolean): string {
-  if (isNextDay) return 'text-text-tertiary'
-  if (justStarted) return 'text-urgent-go'
-  if (minutes >= 18) return 'text-urgent-go'
-  if (minutes >= 5) return 'text-urgent-tight'
-  return 'text-urgent-late'
+function countdownText(minutes: number): string {
+  if (minutes < 60) return `${minutes} min`
+  const h = Math.floor(minutes / 60)
+  const m = minutes % 60
+  return m === 0 ? `${h}h` : `${h}h ${m}m`
 }
 
 function travelLine(distance: number | null): string {
@@ -64,45 +62,52 @@ export default function MosqueCard({
 
       <div className="pointer-events-none flex flex-col gap-[13px] px-4 py-[15px]">
 
-        {/* TOP: countdown + prayer name/time */}
+        {/* TOP: prayer label left + jamaat time left + countdown right */}
         {nextJamaat ? (() => {
-          const { value, unit } = countdownDisplay(nextJamaat.minutesUntil)
-          const colour = urgencyColour(nextJamaat.minutesUntil, nextJamaat.isNextDay, nextJamaat.justStarted)
-          const label = nextJamaat.justStarted ? 'Just started' : nextJamaat.isNextDay ? 'All done' : 'Starts in'
+          const { display, ampm } = formatTime(nextJamaat.time)
+
+          let timeColour: string
+          let label: string
+
+          if (nextJamaat.isNextDay) {
+            timeColour = 'text-text-tertiary'
+            label = `${PRAYER_LABELS[nextJamaat.prayer]} Jamaat`
+          } else if (nextJamaat.justStarted) {
+            timeColour = 'text-urgent-go'
+            label = `${PRAYER_LABELS[nextJamaat.prayer]} Jamaat`
+          } else if (nextJamaat.minutesUntil >= 18) {
+            timeColour = 'text-urgent-go'
+            label = `${PRAYER_LABELS[nextJamaat.prayer]} Jamaat`
+          } else if (nextJamaat.minutesUntil >= 5) {
+            timeColour = 'text-urgent-tight'
+            label = `${PRAYER_LABELS[nextJamaat.prayer]} Jamaat`
+          } else {
+            timeColour = 'text-urgent-late'
+            label = `${PRAYER_LABELS[nextJamaat.prayer]} Jamaat`
+          }
+
+          const showCountdown = !nextJamaat.isNextDay && !nextJamaat.justStarted
+
           return (
-            <div className="flex items-end justify-between">
-              <div>
-                <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary">
+            <div className="flex items-flex-end justify-between">
+              <div className="flex flex-col gap-[3px]">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary">
                   {label}
                 </p>
                 <div className="flex items-baseline">
-                  {nextJamaat.justStarted ? (
-                    <span className={`text-[22px] font-bold leading-[0.9] tracking-[-0.02em] ${colour}`}>
-                      Now
-                    </span>
-                  ) : (
-                    <>
-                      <span className={`font-mono text-[32px] font-bold leading-[0.9] tracking-[-0.03em] ${colour}`}>
-                        {value}
-                      </span>
-                      <span className={`ml-[7px] text-[17px] font-semibold ${colour}`}>
-                        {unit}
-                      </span>
-                    </>
-                  )}
+                  <span className={`font-mono text-[34px] font-bold leading-[0.9] tracking-[-0.03em] ${timeColour}`}>
+                    {display}
+                  </span>
+                  <span className="ml-[6px] text-[15px] font-semibold tracking-normal text-text-tertiary">
+                    {ampm}
+                  </span>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-[13px] font-semibold text-text-primary">
-                  {PRAYER_LABELS[nextJamaat.prayer]}
-                  {nextJamaat.isNextDay && (
-                    <span className="ml-1 text-[11px] font-medium text-text-tertiary">tmrw</span>
-                  )}
-                </p>
-                <p className="font-mono text-[13px] font-medium text-text-tertiary">
-                  {nextJamaat.time}
-                </p>
-              </div>
+              {showCountdown && (
+                <span className="font-mono text-[15px] font-semibold text-text-secondary self-end">
+                  {countdownText(nextJamaat.minutesUntil)}
+                </span>
+              )}
             </div>
           )
         })() : (
@@ -116,12 +121,12 @@ export default function MosqueCard({
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-[6px]">
+              {isFavourited && (
+                <StarIcon filled className="h-[14px] w-[14px] shrink-0 text-text-primary" />
+              )}
               <h2 className="truncate text-[18px] font-semibold leading-tight tracking-[-0.01em] text-text-primary">
                 {name}
               </h2>
-              {isFavourited && (
-                <StarIcon filled className="h-[13px] w-[13px] shrink-0 text-text-tertiary" />
-              )}
             </div>
             {distance !== null && (
               <p className="mt-1 text-[13px] font-medium text-text-secondary">
@@ -138,9 +143,9 @@ export default function MosqueCard({
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
               aria-label="Directions"
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-text-primary text-white"
+              className="flex h-11 w-11 items-center justify-center rounded-xl bg-text-primary text-white"
             >
-              <NavigateIcon className="h-[17px] w-[17px]" />
+              <NavigateIcon className="h-[18px] w-[18px]" />
             </a>
           </div>
         </div>
