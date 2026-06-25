@@ -1,9 +1,9 @@
 'use client'
 
+import Link from 'next/link'
 import { signIn, signOut } from 'next-auth/react'
 import ChevronRightIcon from '@/components/icons/ChevronRightIcon'
 import InfoIcon from '@/components/icons/InfoIcon'
-import ShieldCheckIcon from '@/components/icons/ShieldCheckIcon'
 import MessageSquareIcon from '@/components/icons/MessageSquareIcon'
 
 interface AccountPanelProps {
@@ -41,17 +41,16 @@ export default function AccountPanel({ open, onClose, isSignedIn, userName }: Ac
 
         {/* Info card */}
         <div className="overflow-hidden rounded-2xl border border-card-border bg-white divide-y divide-[#F3F3F0]">
-          <button className="flex w-full items-center gap-[13px] px-4 py-[14px] text-left">
+          <Link
+            href="/about"
+            onClick={onClose}
+            className="flex w-full items-center gap-[13px] px-4 py-[14px] transition-opacity duration-[200ms] ease-out active:opacity-60"
+          >
             <InfoIcon className="h-[18px] w-[18px] text-text-secondary shrink-0" />
             <span className="flex-1 text-[15px] font-medium text-text-primary">About FirstRow</span>
             <ChevronRightIcon className="h-[13px] w-[8px] text-[#C8C8C2]" />
-          </button>
-          <button className="flex w-full items-center gap-[13px] px-4 py-[14px] text-left">
-            <ShieldCheckIcon className="h-[18px] w-[18px] text-text-secondary shrink-0" />
-            <span className="flex-1 text-[15px] font-medium text-text-primary">How we source times</span>
-            <ChevronRightIcon className="h-[13px] w-[8px] text-[#C8C8C2]" />
-          </button>
-          <button className="flex w-full items-center gap-[13px] px-4 py-[14px] text-left">
+          </Link>
+          <button className="flex w-full items-center gap-[13px] px-4 py-[14px] text-left transition-opacity duration-[200ms] ease-out active:opacity-60">
             <MessageSquareIcon className="h-[18px] w-[18px] text-text-secondary shrink-0" />
             <span className="flex-1 text-[15px] font-medium text-text-primary">Send feedback</span>
             <ChevronRightIcon className="h-[13px] w-[8px] text-[#C8C8C2]" />
