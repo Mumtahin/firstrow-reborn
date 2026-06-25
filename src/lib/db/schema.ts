@@ -57,9 +57,9 @@ export const amenities = pgTable('amenities', {
   mosqueId: integer('mosque_id')
     .primaryKey()
     .references(() => mosque.id),
-  hasWomensSpace: boolean('has_womens_space').notNull().default(false),
-  hasCarPark: boolean('has_car_park').notNull().default(false),
-  hasDisabilityAccess: boolean('has_disability_access').notNull().default(false),
+  hasWomensSpace: boolean('has_womens_space'),
+  hasCarPark: boolean('has_car_park'),
+  hasDisabilityAccess: boolean('has_disability_access'),
 })
 
 // Prayer Times — one row per mosque per date

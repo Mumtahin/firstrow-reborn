@@ -41,3 +41,14 @@ body {
   background: var(--background);
   color: var(--foreground);
 }
+
+/* Mapbox popup — rounded to match design language */
+.mapboxgl-popup-content {
+  border-radius: 12px !important;
+  padding: 10px 12px !important;
+  box-shadow: 0 4px 12px rgba(17, 17, 17, 0.1) !important;
+}
+
+.mapboxgl-popup-tip {
+  display: none;
+}

@@ -1,8 +1,8 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-import { useCallback, useRef } from 'react'
-import Map, { Layer, Marker, Source } from 'react-map-gl/mapbox'
+import Link from 'next/link'
+import { useCallback, useRef, useState } from 'react'
+import Map, { Layer, Marker, Popup, Source } from 'react-map-gl/mapbox'
 import CrosshairIcon from '@/components/icons/CrosshairIcon'
 import type { MapRef } from 'react-map-gl/mapbox'
 import 'mapbox-gl/dist/mapbox-gl.css'
@@ -15,8 +15,8 @@ type Props = {
 }
 
 export default function MosqueMap({ mosques, userLat, userLng }: Props) {
-  const router = useRouter()
   const mapRef = useRef<MapRef>(null)
+  const [selected, setSelected] = useState<MosqueWithTimes | null>(null)
 
   const recenter = useCallback(() => {
     mapRef.current?.flyTo({ center: [userLng, userLat], zoom: 13, duration: 800 })
@@ -30,6 +30,7 @@ export default function MosqueMap({ mosques, userLat, userLng }: Props) {
         initialViewState={{ latitude: userLat, longitude: userLng, zoom: 13 }}
         style={{ width: '100%', height: '100%' }}
         mapStyle="mapbox://styles/mapbox/streets-v12"
+        onClick={() => setSelected(null)}
       >
         {/* User location — blue pulsing dot */}
         <Marker latitude={userLat} longitude={userLng} anchor="center">
@@ -46,14 +47,38 @@ export default function MosqueMap({ mosques, userLat, userLng }: Props) {
             latitude={m.lat}
             longitude={m.lng}
             anchor="center"
-            onClick={() => router.push(`/mosque/${m.slug}`)}
+            onClick={(e) => { e.originalEvent.stopPropagation(); setSelected(m) }}
           >
             <div
-              title={m.name}
-              className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-amber-500 ring-2 ring-white shadow-md transition hover:scale-110 hover:bg-amber-400"
+              className={`flex h-6 w-6 cursor-pointer items-center justify-center rounded-full ring-2 ring-white shadow-md transition hover:scale-110 ${selected?.id === m.id ? 'bg-amber-400 scale-110' : 'bg-amber-500 hover:bg-amber-400'}`}
             />
           </Marker>
         ))}
+
+        {/* Popup */}
+        {selected && (
+          <Popup
+            latitude={selected.lat}
+            longitude={selected.lng}
+            anchor="bottom"
+            offset={16}
+            closeButton={false}
+            onClose={() => setSelected(null)}
+          >
+            <div className="min-w-[160px] px-1 py-0.5">
+              <p className="font-semibold text-gray-900 text-sm leading-snug">{selected.name}</p>
+              <p className="text-xs text-gray-500 mt-0.5">
+                {selected.addressLine1}, {selected.postcode}
+              </p>
+              <Link
+                href={`/mosque/${selected.slug}`}
+                className="mt-2 inline-block text-xs font-medium text-amber-600 hover:underline"
+              >
+                View →
+              </Link>
+            </div>
+          </Popup>
+        )}
       </Map>
 
       {/* Recenter button */}
