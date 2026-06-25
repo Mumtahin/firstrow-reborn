@@ -36,7 +36,7 @@ export default function FavouriteButton({ mosqueId, isFavourited, userId, classN
     <button
       onClick={handleClick}
       aria-label={optimisticFav ? 'Remove from favourites' : 'Add to favourites'}
-      className={`flex items-center justify-center transition hover:scale-110 active:scale-95 ${className ?? ''}`}
+      className={`flex items-center justify-center transition-transform duration-[200ms] ease-out active:scale-[0.88] ${className ?? ''}`}
     >
       <StarIcon filled={optimisticFav} className="h-[15px] w-[15px] text-text-tertiary" />
     </button>
