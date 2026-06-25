@@ -50,11 +50,14 @@ export default function AccountPanel({ open, onClose, isSignedIn, userName }: Ac
             <span className="flex-1 text-[15px] font-medium text-text-primary">About FirstRow</span>
             <ChevronRightIcon className="h-[13px] w-[8px] text-[#C8C8C2]" />
           </Link>
-          <button className="flex w-full items-center gap-[13px] px-4 py-[14px] text-left transition-opacity duration-[200ms] ease-out active:opacity-60">
+          <a
+            href="mailto:showcase.unstaffed520@passmail.net?subject=FirstRow%20feedback"
+            className="flex w-full items-center gap-[13px] px-4 py-[14px] transition-opacity duration-[200ms] ease-out active:opacity-60"
+          >
             <MessageSquareIcon className="h-[18px] w-[18px] text-text-secondary shrink-0" />
             <span className="flex-1 text-[15px] font-medium text-text-primary">Send feedback</span>
             <ChevronRightIcon className="h-[13px] w-[8px] text-[#C8C8C2]" />
-          </button>
+          </a>
         </div>
 
         {/* Auth section */}

@@ -148,8 +148,14 @@ export default function AboutPage() {
             </div>
           </div>
           <p className="mt-[10px] px-1 text-[12px] font-medium leading-relaxed text-text-tertiary">
-            If you spot a mistake or outdated times, please send feedback — it helps
-            keep the data accurate.
+            If you spot a mistake or outdated times,{' '}
+            <a
+              href="mailto:showcase.unstaffed520@passmail.net?subject=FirstRow%20feedback"
+              className="text-text-secondary underline underline-offset-2"
+            >
+              send feedback
+            </a>
+            {' '}— it helps keep the data accurate.
           </p>
         </div>
 
