@@ -1,7 +1,7 @@
 'use server'
 
 import { and, eq } from 'drizzle-orm'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
 import { favourite } from '@/lib/db/schema'
@@ -26,6 +26,6 @@ export async function toggleFavourite(mosqueId: number) {
     await db.insert(favourite).values({ userId, mosqueId })
   }
 
-  revalidatePath('/')
+  revalidateTag('mosques', { expire: 0 })
   revalidatePath('/favourites')
 }
