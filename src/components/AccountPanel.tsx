@@ -19,7 +19,7 @@ export default function AccountPanel({ open, onClose, isSignedIn, userName }: Ac
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-40 bg-black/40 transition-opacity duration-300 ${
+        className={`fixed inset-0 z-40 cursor-pointer bg-black/40 transition-opacity duration-300 ${
           open ? 'opacity-100' : 'pointer-events-none opacity-0'
         }`}
         onClick={onClose}
@@ -44,7 +44,7 @@ export default function AccountPanel({ open, onClose, isSignedIn, userName }: Ac
           <Link
             href="/about"
             onClick={onClose}
-            className="flex w-full items-center gap-[13px] px-4 py-[14px] transition-opacity duration-[200ms] ease-out active:opacity-60"
+            className="flex w-full cursor-pointer items-center gap-[13px] px-4 py-[14px] transition-opacity duration-[200ms] ease-out active:opacity-60"
           >
             <InfoIcon className="h-[18px] w-[18px] text-text-secondary shrink-0" />
             <span className="flex-1 text-[15px] font-medium text-text-primary">About FirstRow</span>
@@ -52,7 +52,7 @@ export default function AccountPanel({ open, onClose, isSignedIn, userName }: Ac
           </Link>
           <a
             href="mailto:showcase.unstaffed520@passmail.net?subject=FirstRow%20feedback"
-            className="flex w-full items-center gap-[13px] px-4 py-[14px] transition-opacity duration-[200ms] ease-out active:opacity-60"
+            className="flex w-full cursor-pointer items-center gap-[13px] px-4 py-[14px] transition-opacity duration-[200ms] ease-out active:opacity-60"
           >
             <MessageSquareIcon className="h-[18px] w-[18px] text-text-secondary shrink-0" />
             <span className="flex-1 text-[15px] font-medium text-text-primary">Send feedback</span>
@@ -69,7 +69,7 @@ export default function AccountPanel({ open, onClose, isSignedIn, userName }: Ac
               </p>
               <button
                 onClick={() => signOut({ callbackUrl: '/' })}
-                className="w-full rounded-2xl border border-card-border bg-white py-[14px] text-[15px] font-semibold text-text-primary"
+                className="w-full cursor-pointer rounded-2xl border border-card-border bg-white py-[14px] text-[15px] font-semibold text-text-primary"
               >
                 Sign out
               </button>
@@ -81,7 +81,7 @@ export default function AccountPanel({ open, onClose, isSignedIn, userName }: Ac
               </p>
               <button
                 onClick={() => signIn('google', { callbackUrl: '/' })}
-                className="w-full rounded-2xl bg-text-primary py-[14px] text-[15px] font-semibold text-white"
+                className="w-full cursor-pointer rounded-2xl bg-text-primary py-[14px] text-[15px] font-semibold text-white"
               >
                 Continue with Google
               </button>

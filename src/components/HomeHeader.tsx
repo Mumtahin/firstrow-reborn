@@ -38,7 +38,7 @@ export default function HomeHeader({
         {/* Left — location pill */}
         <button
           onClick={onLocationPillPress}
-          className="flex items-center gap-[6px]"
+          className="flex cursor-pointer items-center gap-[6px]"
         >
           <MapPinIcon className={`h-[13px] w-[13px] shrink-0 ${isManualLocation ? 'text-text-primary' : 'text-text-secondary'}`} />
           <span className="text-[15px] font-semibold tracking-[-0.01em] text-text-primary">
@@ -51,14 +51,14 @@ export default function HomeHeader({
         <div className="flex items-center gap-[9px]">
           <button
             aria-label="Search"
-            className="flex h-[38px] w-[38px] items-center justify-center rounded-full border border-card-border bg-white"
+            className="flex h-[38px] w-[38px] cursor-pointer items-center justify-center rounded-full border border-card-border bg-white"
             onClick={() => setSearchOpen(true)}
           >
             <SearchIcon className="h-[16px] w-[16px] text-text-primary" />
           </button>
           <button
             aria-label="Account"
-            className="flex h-[38px] w-[38px] items-center justify-center rounded-full border border-card-border bg-white overflow-hidden"
+            className="flex h-[38px] w-[38px] cursor-pointer items-center justify-center rounded-full border border-card-border bg-white overflow-hidden"
             onClick={() => setPanelOpen(true)}
           >
             {userImage ? (

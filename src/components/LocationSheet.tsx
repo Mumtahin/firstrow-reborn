@@ -74,10 +74,14 @@ export default function LocationSheet({ open, onClose, onSelect, onUseGPS, isMan
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
   }, [query])
 
-  if (!open) return null
-
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center bg-[#FAFAF8]">
+    <div
+      className={`fixed inset-0 z-50 flex flex-col items-center bg-[#FAFAF8] transition-[opacity,transform] ease-out ${
+        open
+          ? 'opacity-100 translate-y-0 duration-[220ms] pointer-events-auto'
+          : 'opacity-0 translate-y-[8px] duration-[180ms] pointer-events-none'
+      }`}
+    >
       <div className="flex w-full max-w-lg flex-col flex-1 min-h-0">
 
         {/* Search bar */}
@@ -96,7 +100,7 @@ export default function LocationSheet({ open, onClose, onSelect, onUseGPS, isMan
               <button
                 onClick={() => { setQuery(''); inputRef.current?.focus() }}
                 aria-label="Clear"
-                className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full bg-[#E2E2DE]"
+                className="flex h-[18px] w-[18px] shrink-0 cursor-pointer items-center justify-center rounded-full bg-[#E2E2DE]"
               >
                 <svg width="9" height="9" viewBox="0 0 24 24" fill="none">
                   <path d="M6 6l12 12M18 6L6 18" stroke="white" strokeWidth="3" strokeLinecap="round" />
@@ -106,7 +110,7 @@ export default function LocationSheet({ open, onClose, onSelect, onUseGPS, isMan
           </div>
           <button
             onClick={onClose}
-            className="shrink-0 text-[15px] font-semibold text-text-primary"
+            className={`shrink-0 cursor-pointer text-[15px] font-semibold text-text-primary transition-opacity duration-[220ms] ${open ? 'opacity-100' : 'opacity-0'}`}
           >
             Cancel
           </button>
@@ -118,7 +122,7 @@ export default function LocationSheet({ open, onClose, onSelect, onUseGPS, isMan
           {/* Use my location row */}
           <button
             onClick={onUseGPS}
-            className="flex w-full items-center gap-[13px] border-b border-[#F3F3F0] px-0.5 py-[14px]"
+            className="flex w-full cursor-pointer items-center gap-[13px] border-b border-[#F3F3F0] px-0.5 py-[14px]"
           >
             <CrosshairIcon className={`h-[18px] w-[18px] shrink-0 ${isManual ? 'text-text-secondary' : 'text-urgent-go'}`} />
             <span className={`flex-1 text-left text-[15px] ${isManual ? 'font-medium text-text-primary' : 'font-semibold text-urgent-go'}`}>
@@ -143,14 +147,15 @@ export default function LocationSheet({ open, onClose, onSelect, onUseGPS, isMan
             </p>
           )}
 
-          {/* Suggestions */}
+          {/* Suggestions — staggered fade-up */}
           {!loading && suggestions.length > 0 && (
             <div className="flex flex-col">
-              {suggestions.map((s) => (
+              {suggestions.map((s, i) => (
                 <button
                   key={s.id}
                   onClick={() => onSelect({ lat: s.lat, lng: s.lng, label: s.label })}
-                  className="flex w-full items-center gap-[13px] border-b border-[#F3F3F0] px-0.5 py-[14px] last:border-0 text-left"
+                  className="animate-fade-up flex w-full cursor-pointer items-center gap-[13px] border-b border-[#F3F3F0] px-0.5 py-[14px] last:border-0 text-left"
+                  style={{ animationDelay: `${i * 20}ms` }}
                 >
                   <MapPinIcon className="h-[18px] w-[18px] shrink-0 text-text-tertiary" />
                   <div className="flex min-w-0 flex-col">

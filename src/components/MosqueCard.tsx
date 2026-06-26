@@ -63,7 +63,7 @@ export default function MosqueCard({
   return (
     <div className="relative rounded-2xl border border-card-border bg-white shadow-card transition-transform duration-[200ms] ease-out active:scale-[0.99]">
       {/* Full-card tap target */}
-      <Link href={`/mosque/${slug}`} className="absolute inset-0 z-0 rounded-2xl" aria-label={name} />
+      <Link href={`/mosque/${slug}`} className="absolute inset-0 z-0 cursor-pointer rounded-2xl" aria-label={name} />
 
       <div className="pointer-events-none flex flex-col gap-[13px] px-4 py-[15px]">
 
@@ -148,7 +148,7 @@ export default function MosqueCard({
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
               aria-label="Directions"
-              className="flex h-11 w-11 items-center justify-center rounded-xl bg-text-primary text-white transition-transform duration-[200ms] ease-out active:scale-[0.92]"
+              className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-xl bg-text-primary text-white transition-transform duration-[200ms] ease-out active:scale-[0.92]"
             >
               <NavigateIcon className="h-[18px] w-[18px]" />
             </a>
