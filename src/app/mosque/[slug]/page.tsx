@@ -26,6 +26,11 @@ const PRAYER_LABELS: Record<string, string> = {
   fajr: 'Fajr', zuhr: 'Zuhr', asr: 'Asr', maghrib: 'Maghrib', isha: 'Isha',
 }
 
+function getPrayerLabel(key: string, friday: boolean): string {
+  if (key === 'zuhr' && friday) return "Jummah"
+  return PRAYER_LABELS[key] ?? key
+}
+
 function to12h(time: string | null | undefined): string {
   if (!time) return '—'
   const [h, m] = time.split(':').map(Number)
@@ -44,6 +49,11 @@ function shiftDate(dateStr: string, days: number): string {
   const [y, mo, d] = dateStr.split('-').map(Number)
   const date = new Date(Date.UTC(y, mo - 1, d + days))
   return date.toISOString().split('T')[0]
+}
+
+function isFriday(dateStr: string): boolean {
+  const [y, mo, d] = dateStr.split('-').map(Number)
+  return new Date(Date.UTC(y, mo - 1, d)).getUTCDay() === 5
 }
 
 function todayUK(): string {
@@ -114,6 +124,7 @@ export default async function MosqueDetailPage({
   const nextPrayer = nextJamaat && !nextJamaat.isNextDay ? nextJamaat.prayer : null
   const showHero = isToday && nextJamaat && !nextJamaat.isNextDay
 
+  const friday = isFriday(date)
   const prevDate = shiftDate(date, -1)
   const nextDate = shiftDate(date, 1)
 
@@ -162,7 +173,7 @@ export default async function MosqueDetailPage({
             : nextJamaat.minutesUntil >= 18 ? 'text-urgent-go'
             : nextJamaat.minutesUntil >= 5 ? 'text-urgent-tight'
             : 'text-urgent-late'
-          const label = `${PRAYER_LABELS[nextJamaat.prayer]} Jamaat`
+          const label = `${getPrayerLabel(nextJamaat.prayer, friday)} Jamaat`
           const showCountdown = !nextJamaat.justStarted
           return (
             <div className="rounded-2xl border border-card-border bg-white shadow-card">
@@ -264,7 +275,8 @@ export default async function MosqueDetailPage({
           </div>
 
           <div className="overflow-hidden rounded-2xl border border-card-border bg-white divide-y divide-[#F3F3F0]">
-            {PRAYERS.map(({ key, label }) => {
+            {PRAYERS.map(({ key }) => {
+              const label = getPrayerLabel(key, friday)
               const jamaatTime = mosque[`${key}Jamaat` as keyof typeof mosque] as string | null
               const startTime = mosque[`${key}Start` as keyof typeof mosque] as string | null
               if (!jamaatTime && !startTime && !isToday) return null

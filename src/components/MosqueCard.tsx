@@ -25,6 +25,11 @@ const PRAYER_LABELS: Record<string, string> = {
   isha: 'Isha',
 }
 
+function getPrayerCardLabel(key: string): string {
+  if (key === 'zuhr' && new Date().getDay() === 5) return 'Jummah'
+  return `${PRAYER_LABELS[key] ?? key} Jamaat`
+}
+
 function formatTime(time: string): { display: string; ampm: string } {
   const [h, m] = time.split(':').map(Number)
   const ampm = h >= 12 ? 'PM' : 'AM'
@@ -71,19 +76,19 @@ export default function MosqueCard({
 
           if (nextJamaat.isNextDay) {
             timeColour = 'text-text-tertiary'
-            label = `${PRAYER_LABELS[nextJamaat.prayer]} Jamaat`
+            label = getPrayerCardLabel(nextJamaat.prayer)
           } else if (nextJamaat.justStarted) {
             timeColour = 'text-urgent-go'
-            label = `${PRAYER_LABELS[nextJamaat.prayer]} Jamaat`
+            label = getPrayerCardLabel(nextJamaat.prayer)
           } else if (nextJamaat.minutesUntil >= 18) {
             timeColour = 'text-urgent-go'
-            label = `${PRAYER_LABELS[nextJamaat.prayer]} Jamaat`
+            label = getPrayerCardLabel(nextJamaat.prayer)
           } else if (nextJamaat.minutesUntil >= 5) {
             timeColour = 'text-urgent-tight'
-            label = `${PRAYER_LABELS[nextJamaat.prayer]} Jamaat`
+            label = getPrayerCardLabel(nextJamaat.prayer)
           } else {
             timeColour = 'text-urgent-late'
-            label = `${PRAYER_LABELS[nextJamaat.prayer]} Jamaat`
+            label = getPrayerCardLabel(nextJamaat.prayer)
           }
 
           const showCountdown = !nextJamaat.isNextDay && !nextJamaat.justStarted

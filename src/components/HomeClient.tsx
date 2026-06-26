@@ -20,6 +20,11 @@ const PRAYER_PILLS: { key: Prayer; label: string }[] = [
   { key: 'isha', label: 'Isha' },
 ]
 
+function getPillLabel(key: Prayer, label: string): string {
+  if (key === 'zuhr' && new Date().getDay() === 5) return "Jummah"
+  return label
+}
+
 function getSpecificPrayerJamaat(
   mosque: MosqueWithTimes,
   prayer: Prayer,
@@ -136,7 +141,7 @@ export default function HomeClient({ mosques, favouriteIds, userId }: Props) {
                 : 'border border-card-border bg-white text-text-secondary'
             }`}
           >
-            {label}
+            {getPillLabel(key, label)}
           </button>
         ))}
       </div>
@@ -194,7 +199,7 @@ export default function HomeClient({ mosques, favouriteIds, userId }: Props) {
           </div>
         ) : selectedPrayer && favourites.length === 0 && (
           <p className="px-0.5 text-[13px] font-medium text-text-tertiary">
-            No mosques with upcoming {PRAYER_PILLS.find(p => p.key === selectedPrayer)?.label} nearby.
+            No mosques with upcoming {getPillLabel(selectedPrayer!, PRAYER_PILLS.find(p => p.key === selectedPrayer)?.label ?? '')} nearby.
           </p>
         )}
 
