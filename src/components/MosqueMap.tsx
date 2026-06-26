@@ -94,7 +94,7 @@ export default function MosqueMap({ mosques, userLat, userLng, isManualLocation 
       {/* Recenter button */}
       <button
         onClick={recenter}
-        className="absolute top-2 left-2 flex h-9 w-9 items-center justify-center rounded-lg bg-white shadow-md hover:bg-gray-50"
+        className="absolute top-2 left-2 flex h-9 w-9 items-center justify-center rounded-lg bg-white dark:bg-[#1D1B18] shadow-md hover:bg-gray-50 dark:hover:bg-[#26231F]"
         aria-label="Recenter map"
       >
         <CrosshairIcon className="h-5 w-5 text-gray-700" />

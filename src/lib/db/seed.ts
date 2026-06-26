@@ -565,6 +565,34 @@ const mosques = [
     amenities: { hasWomensSpace: null, hasCarPark: false, hasDisabilityAccess: true },
     source: null,
   },
+  {
+    mosque: { name: 'Baitul Mamur Academy', slug: 'baitul-mamur-academy', status: 'active' as const },
+    location: { addressLine1: '191 Roman Rd ', addressLine2: 'Globe Town', town: 'London', postcode: 'E2 0QY', lat: 51.5294945, lng: -0.0465827 },
+    contact: { website: null, phone: null, email: null },
+    amenities: { hasWomensSpace: null, hasCarPark: null, hasDisabilityAccess: null },
+    source: null,
+  },
+  {
+    mosque: { name: 'Bow Common Masjid And Cultural Trust', slug: 'bow-common-masjid-and-cultural-trust', status: 'active' as const },
+    location: { addressLine1: '208-210 Devons Rd', addressLine2: null, town: 'London', postcode: 'E3 3PN', lat: 51.5220951, lng: -0.0192232 },
+    contact: { website: null, phone: null, email: null },
+    amenities: { hasWomensSpace: null, hasCarPark: null, hasDisabilityAccess: null },
+    source: null,
+  },
+  {
+    mosque: { name: 'Lansbury Estate Muslim Association', slug: 'lansbury-estate-muslim-association', status: 'active' as const },
+    location: { addressLine1: '20 Alton St', addressLine2: null, town: 'London', postcode: 'E14 6BZ', lat: 51.5152993, lng: -0.0181974 },
+    contact: { website: null, phone: '02030698738', email: null },
+    amenities: { hasWomensSpace: null, hasCarPark: null, hasDisabilityAccess: null },
+    source: null,
+  },
+  {
+    mosque: { name: 'Teviot Bangladeshi Cultural Community Group', slug: 'teviot-bangladeshi-cultural-community-group', status: 'active' as const },
+    location: { addressLine1: '181 Teviot St', addressLine2: null, town: 'London', postcode: 'E14 6PY', lat: 51.518947, lng: -0.0119525 },
+    contact: { website: null, phone: '07909594068', email: null },
+    amenities: { hasWomensSpace: null, hasCarPark: null, hasDisabilityAccess: null },
+    source: null,
+  }
 ]
 
 // Seed

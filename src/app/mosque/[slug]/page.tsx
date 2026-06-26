@@ -139,15 +139,15 @@ export default async function MosqueDetailPage({
         <Link
           href="/"
           aria-label="Back"
-          className="flex h-[38px] w-[38px] items-center justify-center rounded-full border border-card-border bg-white transition-transform duration-[200ms] ease-out active:scale-[0.92]"
+          className="flex h-[38px] w-[38px] items-center justify-center rounded-full border border-card-border bg-white dark:bg-[#1D1B18] transition-transform duration-[200ms] ease-out active:scale-[0.92]"
         >
-          <ChevronLeftIcon className="h-[15px] w-[15px] text-[#333]" />
+          <ChevronLeftIcon className="h-[15px] w-[15px] text-text-primary" />
         </Link>
         <FavouriteButton
           mosqueId={mosque.id}
           isFavourited={isFavourited}
           userId={userId}
-          className="h-[38px] w-[38px] rounded-full border border-card-border bg-white"
+          className="h-[38px] w-[38px] rounded-full border border-card-border bg-white dark:bg-[#1D1B18]"
         />
       </div>
 
@@ -176,7 +176,7 @@ export default async function MosqueDetailPage({
           const label = `${getPrayerLabel(nextJamaat.prayer, friday)} Jamaat`
           const showCountdown = !nextJamaat.justStarted
           return (
-            <div className="rounded-2xl border border-card-border bg-white shadow-card">
+            <div className="rounded-2xl border border-card-border bg-white dark:bg-[#1D1B18] shadow-card">
               <div className="flex flex-col gap-[13px] px-4 py-[15px]">
                 {/* Prayer label + time + countdown */}
                 <div className="flex items-end justify-between">
@@ -217,7 +217,7 @@ export default async function MosqueDetailPage({
                     href={`https://maps.google.com/?q=${mosque.lat},${mosque.lng}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex w-full items-center justify-center gap-2 rounded-[14px] bg-text-primary py-[15px] text-[16px] font-semibold text-white transition-transform duration-[200ms] ease-out active:scale-[0.99]"
+                    className="flex w-full items-center justify-center gap-2 rounded-[14px] bg-text-primary py-[15px] text-[16px] font-semibold text-[#FAFAF8] dark:text-[#16130F] transition-transform duration-[200ms] ease-out active:scale-[0.99]"
                   >
                     Directions
                     <NavigateIcon className="h-[17px] w-[17px]" />
@@ -230,7 +230,7 @@ export default async function MosqueDetailPage({
 
         {/* All done for today banner */}
         {isToday && allPassed && (
-          <div className="rounded-[18px] border border-card-border bg-white p-[18px]">
+          <div className="rounded-[18px] border border-card-border bg-white dark:bg-[#1D1B18] p-[18px]">
             <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-tertiary">
               All done for today
             </p>
@@ -274,7 +274,7 @@ export default async function MosqueDetailPage({
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-2xl border border-card-border bg-white divide-y divide-[#F3F3F0]">
+          <div className="overflow-hidden rounded-2xl border border-card-border bg-white dark:bg-[#1D1B18] divide-y divide-[#F3F3F0] dark:divide-[#2A2722]">
             {PRAYERS.map(({ key }) => {
               const label = getPrayerLabel(key, friday)
               const jamaatTime = mosque[`${key}Jamaat` as keyof typeof mosque] as string | null
@@ -291,7 +291,7 @@ export default async function MosqueDetailPage({
               const timeClass =
                 state === 'past' ? 'text-[15px] font-medium text-text-secondary'
                 : state === 'current' ? 'text-[16px] font-bold text-urgent-go'
-                : 'text-[15px] font-medium text-[#333]'
+                : 'text-[15px] font-medium text-text-primary'
 
               return (
                 <div key={key} className={`flex items-center justify-between px-4 py-[13px] ${rowBg}`}>
@@ -336,8 +336,8 @@ export default async function MosqueDetailPage({
             </p>
             <div className="grid grid-cols-2 gap-[10px]">
               {mosque.hasWomensSpace && (
-                <div className="flex items-center gap-[11px] rounded-[13px] border border-card-border bg-white px-[14px] py-[13px]">
-                  <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[9px] bg-[#F1F4F2]">
+                <div className="flex items-center gap-[11px] rounded-[13px] border border-card-border bg-white dark:bg-[#1D1B18] px-[14px] py-[13px]">
+                  <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[9px] bg-[#F1F4F2] dark:bg-[#26231F]">
                     <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
                       <circle cx="9" cy="7" r="3" stroke="#15803D" strokeWidth="1.9" />
                       <path d="M3 21v-1a5 5 0 015-5h2a5 5 0 015 5v1" stroke="#15803D" strokeWidth="1.9" strokeLinecap="round" />
@@ -349,8 +349,8 @@ export default async function MosqueDetailPage({
                 </div>
               )}
               {mosque.hasDisabilityAccess && (
-                <div className="flex items-center gap-[11px] rounded-[13px] border border-card-border bg-white px-[14px] py-[13px]">
-                  <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[9px] bg-[#F1F4F2]">
+                <div className="flex items-center gap-[11px] rounded-[13px] border border-card-border bg-white dark:bg-[#1D1B18] px-[14px] py-[13px]">
+                  <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[9px] bg-[#F1F4F2] dark:bg-[#26231F]">
                     <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
                       <circle cx="12" cy="4" r="1.8" stroke="#15803D" strokeWidth="1.9" />
                       <path d="M9 8h4v5h3l2 6" stroke="#15803D" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
@@ -361,8 +361,8 @@ export default async function MosqueDetailPage({
                 </div>
               )}
               {mosque.hasCarPark && (
-                <div className="flex items-center gap-[11px] rounded-[13px] border border-card-border bg-white px-[14px] py-[13px]">
-                  <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[9px] bg-[#F1F4F2]">
+                <div className="flex items-center gap-[11px] rounded-[13px] border border-card-border bg-white dark:bg-[#1D1B18] px-[14px] py-[13px]">
+                  <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[9px] bg-[#F1F4F2] dark:bg-[#26231F]">
                     <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
                       <rect x="4" y="4" width="16" height="16" rx="4" stroke="#15803D" strokeWidth="1.9" />
                       <path d="M9.5 16V8h3a2.4 2.4 0 010 4.8H9.5" stroke="#15803D" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
@@ -386,24 +386,24 @@ export default async function MosqueDetailPage({
             <p className="mb-[10px] px-0.5 text-[12px] font-bold uppercase tracking-[0.07em] text-text-tertiary">
               Contact
             </p>
-            <div className="overflow-hidden rounded-2xl border border-card-border bg-white divide-y divide-[#F3F3F0]">
+            <div className="overflow-hidden rounded-2xl border border-card-border bg-white dark:bg-[#1D1B18] divide-y divide-[#F3F3F0] dark:divide-[#2A2722]">
               {mosque.phone && (
                 <a href={`tel:${mosque.phone}`} className="flex items-center gap-3 px-4 py-[13px] transition-opacity duration-[200ms] ease-out active:opacity-60">
-                  <PhoneIcon className="h-[17px] w-[17px] text-[#666]" />
+                  <PhoneIcon className="h-[17px] w-[17px] text-text-secondary" />
                   <span className="flex-1 text-[15px] font-medium text-text-primary">{mosque.phone}</span>
                   <ChevronRightIcon className="h-[13px] w-[8px] text-[#C8C8C2]" />
                 </a>
               )}
               {mosque.website && (
                 <a href={mosque.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-4 py-[13px] transition-opacity duration-[200ms] ease-out active:opacity-60">
-                  <GlobeIcon className="h-[17px] w-[17px] text-[#666]" />
+                  <GlobeIcon className="h-[17px] w-[17px] text-text-secondary" />
                   <span className="flex-1 text-[15px] font-medium text-text-primary">{mosque.website.replace(/^https?:\/\//, '')}</span>
                   <ChevronRightIcon className="h-[13px] w-[8px] text-[#C8C8C2]" />
                 </a>
               )}
               {mosque.email && (
                 <a href={`mailto:${mosque.email}`} className="flex items-center gap-3 px-4 py-[13px] transition-opacity duration-[200ms] ease-out active:opacity-60">
-                  <MailIcon className="h-[17px] w-[17px] text-[#666]" />
+                  <MailIcon className="h-[17px] w-[17px] text-text-secondary" />
                   <span className="flex-1 text-[15px] font-medium text-text-primary">{mosque.email}</span>
                   <ChevronRightIcon className="h-[13px] w-[8px] text-[#C8C8C2]" />
                 </a>

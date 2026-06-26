@@ -94,7 +94,7 @@ export default function HomeClient({ mosques, favouriteIds, userId, location }: 
         </div>
       )}
       {location.status === 'denied' && (
-        <div className="mx-4 mb-4 rounded-2xl border border-card-border bg-white px-4 py-3">
+        <div className="mx-4 mb-4 rounded-2xl border border-card-border bg-white dark:bg-[#1D1B18] px-4 py-3">
           <p className="text-[13px] font-semibold text-text-primary">Location access needed</p>
           <p className="mt-0.5 text-[13px] font-medium text-text-secondary">
             Allow location access to sort by proximity.
@@ -108,8 +108,8 @@ export default function HomeClient({ mosques, favouriteIds, userId, location }: 
           onClick={() => setSelectedPrayer(null)}
           className={`shrink-0 rounded-full px-[14px] py-[7px] text-[13px] font-semibold transition-colors ${
             selectedPrayer === null
-              ? 'bg-text-primary text-white'
-              : 'border border-card-border bg-white text-text-secondary'
+              ? 'bg-text-primary text-[#FAFAF8] dark:text-[#16130F]'
+              : 'border border-card-border bg-white dark:bg-[#1D1B18] text-text-secondary'
           }`}
         >
           Next
@@ -120,8 +120,8 @@ export default function HomeClient({ mosques, favouriteIds, userId, location }: 
             onClick={() => setSelectedPrayer(selectedPrayer === key ? null : key)}
             className={`shrink-0 rounded-full px-[14px] py-[7px] text-[13px] font-semibold transition-colors ${
               selectedPrayer === key
-                ? 'bg-text-primary text-white'
-                : 'border border-card-border bg-white text-text-secondary'
+                ? 'bg-text-primary text-[#FAFAF8] dark:text-[#16130F]'
+                : 'border border-card-border bg-white dark:bg-[#1D1B18] text-text-secondary'
             }`}
           >
             {getPillLabel(key, label)}

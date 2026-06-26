@@ -16,9 +16,9 @@ export default function AboutPage() {
         <Link
           href="/"
           aria-label="Back"
-          className="flex h-[38px] w-[38px] items-center justify-center rounded-full border border-card-border bg-white transition-transform duration-[200ms] ease-out active:scale-[0.92]"
+          className="flex h-[38px] w-[38px] items-center justify-center rounded-full border border-card-border bg-white dark:bg-[#1D1B18] transition-transform duration-[200ms] ease-out active:scale-[0.92]"
         >
-          <ChevronLeftIcon className="h-[15px] w-[15px] text-[#333]" />
+          <ChevronLeftIcon className="h-[15px] w-[15px] text-text-primary" />
         </Link>
       </div>
 
@@ -48,7 +48,7 @@ export default function AboutPage() {
         </div>
 
         {/* Origin */}
-        <div className="overflow-hidden rounded-2xl border border-card-border bg-white">
+        <div className="overflow-hidden rounded-2xl border border-card-border bg-white dark:bg-[#1D1B18]">
           <div className="px-4 py-5">
             <p className="text-[15px] font-medium leading-relaxed text-text-secondary">
               FirstRow is a simple app for finding nearby mosques and their jamaat times.
@@ -63,7 +63,7 @@ export default function AboutPage() {
           <p className="mb-[10px] px-0.5 text-[11px] font-bold uppercase tracking-[0.07em] text-text-tertiary">
             The idea
           </p>
-          <div className="overflow-hidden rounded-2xl border border-card-border bg-white">
+          <div className="overflow-hidden rounded-2xl border border-card-border bg-white dark:bg-[#1D1B18]">
             <div className="px-4 py-5">
               <p className="text-[15px] font-medium leading-relaxed text-text-secondary">
                 Instead of checking multiple mosque websites or calling ahead, FirstRow
@@ -79,7 +79,7 @@ export default function AboutPage() {
           <p className="mb-[10px] px-0.5 text-[11px] font-bold uppercase tracking-[0.07em] text-text-tertiary">
             What it does
           </p>
-          <div className="overflow-hidden rounded-2xl border border-card-border bg-white divide-y divide-[#F3F3F0]">
+          <div className="overflow-hidden rounded-2xl border border-card-border bg-white dark:bg-[#1D1B18] divide-y divide-[#F3F3F0] dark:divide-[#2A2722]">
             <div className="px-4 py-[14px]">
               <p className="text-[15px] font-semibold text-text-primary">Next jamaat at a glance</p>
               <p className="mt-[3px] text-[13px] font-medium leading-relaxed text-text-secondary">
@@ -123,7 +123,7 @@ export default function AboutPage() {
           <p className="mb-[10px] px-0.5 text-[11px] font-bold uppercase tracking-[0.07em] text-text-tertiary">
             Coverage
           </p>
-          <div className="overflow-hidden rounded-2xl border border-card-border bg-white">
+          <div className="overflow-hidden rounded-2xl border border-card-border bg-white dark:bg-[#1D1B18]">
             <div className="px-4 py-5">
               <p className="text-[15px] font-medium leading-relaxed text-text-secondary">
                 FirstRow currently covers mosques in Tower Hamlets, where the data is most
@@ -138,7 +138,7 @@ export default function AboutPage() {
           <p className="mb-[10px] px-0.5 text-[11px] font-bold uppercase tracking-[0.07em] text-text-tertiary">
             How times are sourced
           </p>
-          <div className="overflow-hidden rounded-2xl border border-card-border bg-white divide-y divide-[#F3F3F0]">
+          <div className="overflow-hidden rounded-2xl border border-card-border bg-white dark:bg-[#1D1B18] divide-y divide-[#F3F3F0] dark:divide-[#2A2722]">
             <div className="px-4 py-[14px]">
               <p className="text-[15px] font-semibold text-text-primary">Direct from mosques</p>
               <p className="mt-[3px] text-[13px] font-medium leading-relaxed text-text-secondary">

@@ -53,7 +53,7 @@ export default function SearchOverlay({ open, onClose, mosques }: Props) {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col items-center bg-[#FAFAF8] transition-[opacity,transform] ease-out ${
+      className={`fixed inset-0 z-50 flex flex-col items-center bg-[#FAFAF8] dark:bg-[#131210] transition-[opacity,transform] ease-out ${
         open
           ? 'opacity-100 translate-y-0 duration-[220ms] pointer-events-auto'
           : 'opacity-0 translate-y-[8px] duration-[180ms] pointer-events-none'
@@ -63,7 +63,7 @@ export default function SearchOverlay({ open, onClose, mosques }: Props) {
 
         {/* Search bar */}
         <div className="flex items-center gap-3 px-4 pb-3 pt-[54px]">
-          <div className="flex flex-1 items-center gap-[9px] rounded-[13px] border-[1.5px] border-text-primary bg-white px-[13px] py-[11px]">
+          <div className="flex flex-1 items-center gap-[9px] rounded-[13px] border-[1.5px] border-text-primary bg-white dark:bg-[#1D1B18] px-[13px] py-[11px]">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0">
               <circle cx="11" cy="11" r="7" stroke="#888" strokeWidth="2" />
               <path d="M21 21l-4-4" stroke="#888" strokeWidth="2" strokeLinecap="round" />
