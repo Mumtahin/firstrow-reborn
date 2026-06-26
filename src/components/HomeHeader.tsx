@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
 import MapPinIcon from '@/components/icons/MapPinIcon'
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon'
@@ -15,43 +15,32 @@ interface HomeHeaderProps {
   userName: string | null
   userImage: string | null
   mosques: MosqueWithTimes[]
+  locationLabel: string | null
+  isManualLocation: boolean
+  onLocationPillPress: () => void
 }
 
-export default function HomeHeader({ userId, userName, userImage, mosques }: HomeHeaderProps) {
-  const [locationLabel, setLocationLabel] = useState<string | null>(null)
+export default function HomeHeader({
+  userId,
+  userName,
+  userImage,
+  mosques,
+  locationLabel,
+  isManualLocation,
+  onLocationPillPress,
+}: HomeHeaderProps) {
   const [panelOpen, setPanelOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
-
-  useEffect(() => {
-    const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
-    if (!token) return
-
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude: lat, longitude: lng } = position.coords
-        try {
-          const res = await fetch(
-            `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${token}&types=neighborhood,locality&limit=1`
-          )
-          const data = await res.json()
-          const label = data.features?.[0]?.text
-          if (label) setLocationLabel(label)
-        } catch {
-          // silently fail
-        }
-      },
-      () => {
-        // silently fail
-      }
-    )
-  }, [])
 
   return (
     <>
       <div className="flex items-center justify-between px-4 pb-[14px] pt-10">
         {/* Left — location pill */}
-        <button className="flex items-center gap-[6px]">
-          <MapPinIcon className="h-[13px] w-[13px] text-text-secondary shrink-0" />
+        <button
+          onClick={onLocationPillPress}
+          className="flex items-center gap-[6px]"
+        >
+          <MapPinIcon className={`h-[13px] w-[13px] shrink-0 ${isManualLocation ? 'text-text-primary' : 'text-text-secondary'}`} />
           <span className="text-[15px] font-semibold tracking-[-0.01em] text-text-primary">
             {locationLabel ?? 'Near you'}
           </span>

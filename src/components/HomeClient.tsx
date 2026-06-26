@@ -6,6 +6,7 @@ import { haversineDistance } from '@/lib/utils/distance'
 import { getNextJamaat, parseTime, toUKMinutes } from '@/lib/utils/getNextJamaat'
 import type { Prayer, NextJamaatResult } from '@/lib/utils/getNextJamaat'
 import type { MosqueWithTimes } from '@/lib/db/queries'
+import type { ClientLocation } from './HomeShell'
 import MosqueCard from './MosqueCard'
 import StarIcon from './icons/StarIcon'
 import MapPinIcon from './icons/MapPinIcon'
@@ -47,31 +48,13 @@ type Props = {
   mosques: MosqueWithTimes[]
   favouriteIds: number[]
   userId: string | null
+  location: ClientLocation
 }
 
-type LocationState =
-  | { status: 'pending' }
-  | { status: 'granted'; lat: number; lng: number }
-  | { status: 'denied' }
-  | { status: 'unavailable' }
-
-export default function HomeClient({ mosques, favouriteIds, userId }: Props) {
-  const [location, setLocation] = useState<LocationState>({ status: 'pending' })
+export default function HomeClient({ mosques, favouriteIds, userId, location }: Props) {
   const [now, setNow] = useState(() => new Date())
   const [selectedPrayer, setSelectedPrayer] = useState<Prayer | null>(null)
   const favSet = new Set(favouriteIds)
-
-  useEffect(() => {
-    if (!navigator.geolocation) {
-      setLocation({ status: 'unavailable' })
-      return
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) =>
-        setLocation({ status: 'granted', lat: pos.coords.latitude, lng: pos.coords.longitude }),
-      () => setLocation({ status: 'denied' })
-    )
-  }, [])
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 60_000)
@@ -81,7 +64,7 @@ export default function HomeClient({ mosques, favouriteIds, userId }: Props) {
   const enriched = mosques
     .map((m) => ({
       ...m,
-      distance: location.status === 'granted'
+      distance: location.status === 'ready'
         ? haversineDistance(location.lat, location.lng, m.lat, m.lng)
         : null,
       nextJamaat: selectedPrayer
@@ -105,12 +88,12 @@ export default function HomeClient({ mosques, favouriteIds, userId }: Props) {
           <div className="h-6 w-6 animate-spin rounded-full border-2 border-card-border-fav border-t-text-tertiary" />
         </div>
       )}
-      {location.status === 'granted' && (
+      {location.status === 'ready' && (
         <div className="mb-4 px-4">
           <MosqueMap mosques={mosques} userLat={location.lat} userLng={location.lng} />
         </div>
       )}
-      {(location.status === 'denied' || location.status === 'unavailable') && (
+      {location.status === 'denied' && (
         <div className="mx-4 mb-4 rounded-2xl border border-card-border bg-white px-4 py-3">
           <p className="text-[13px] font-semibold text-text-primary">Location access needed</p>
           <p className="mt-0.5 text-[13px] font-medium text-text-secondary">

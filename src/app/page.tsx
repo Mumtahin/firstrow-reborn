@@ -1,6 +1,5 @@
 import { getMosquesWithPrayerTimes, getFavouriteIds } from '@/lib/db/queries'
-import HomeClient from '@/components/HomeClient'
-import HomeHeader from '@/components/HomeHeader'
+import HomeShell from '@/components/HomeShell'
 import { auth } from '@/auth'
 
 function dateString(daysFromNow: number): string {
@@ -23,8 +22,13 @@ export default async function HomePage() {
 
   return (
     <main className="mx-auto w-full max-w-lg">
-      <HomeHeader userId={userId} userName={session?.user?.name ?? null} userImage={session?.user?.image ?? null} mosques={mosques} />
-      <HomeClient mosques={mosques} favouriteIds={favouriteIds} userId={userId} />
+      <HomeShell
+        mosques={mosques}
+        favouriteIds={favouriteIds}
+        userId={userId}
+        userName={session?.user?.name ?? null}
+        userImage={session?.user?.image ?? null}
+      />
     </main>
   )
 }
