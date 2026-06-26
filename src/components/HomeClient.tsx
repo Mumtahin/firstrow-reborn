@@ -90,7 +90,7 @@ export default function HomeClient({ mosques, favouriteIds, userId, location }: 
       )}
       {location.status === 'ready' && (
         <div className="mb-4 px-4">
-          <MosqueMap mosques={mosques} userLat={location.lat} userLng={location.lng} />
+          <MosqueMap mosques={mosques} userLat={location.lat} userLng={location.lng} isManualLocation={location.isManual} />
         </div>
       )}
       {location.status === 'denied' && (

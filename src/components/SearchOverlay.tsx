@@ -69,7 +69,7 @@ export default function SearchOverlay({ open, onClose, mosques }: Props) {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search places or mosques"
+            placeholder="Search mosques"
             className="flex-1 bg-transparent text-[15px] font-medium text-text-primary placeholder:text-text-tertiary focus:outline-none"
           />
           {query && (

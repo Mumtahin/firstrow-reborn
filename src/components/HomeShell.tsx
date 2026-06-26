@@ -10,7 +10,7 @@ type ManualLocation = { lat: number; lng: number; label: string }
 
 export type ClientLocation =
   | { status: 'pending' }
-  | { status: 'ready'; lat: number; lng: number }
+  | { status: 'ready'; lat: number; lng: number; isManual: boolean }
   | { status: 'denied' }
 
 const STORAGE_KEY = 'firstrow_manual_location'
@@ -48,7 +48,7 @@ export default function HomeShell({ mosques, favouriteIds, userId, userName, use
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const { latitude: lat, longitude: lng } = pos.coords
-        setGpsState({ status: 'ready', lat, lng })
+        setGpsState({ status: 'ready', lat, lng, isManual: false })
         const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
         if (!token) return
         try {
@@ -81,7 +81,7 @@ export default function HomeShell({ mosques, favouriteIds, userId, userName, use
   const isManual = manualLocation !== null
   const locationLabel = isManual ? manualLocation.label : gpsLabel
   const effectiveLocation: ClientLocation = isManual
-    ? { status: 'ready', lat: manualLocation.lat, lng: manualLocation.lng }
+    ? { status: 'ready', lat: manualLocation.lat, lng: manualLocation.lng, isManual: true }
     : gpsState
 
   return (

@@ -328,35 +328,56 @@ export default async function MosqueDetailPage({
           </div>
         </div>
 
-        {/* Map */}
-        {mosque.lat !== null && mosque.lng !== null && (
-          <MosqueDetailMapClient lat={mosque.lat} lng={mosque.lng} name={mosque.name} />
-        )}
-
         {/* Facilities */}
         {hasAmenities && (
           <div>
             <p className="mb-[10px] px-0.5 text-[12px] font-bold uppercase tracking-[0.07em] text-text-tertiary">
               Facilities
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-2 gap-[10px]">
               {mosque.hasWomensSpace && (
-                <span className="rounded-full border border-card-border bg-white px-[13px] py-[7px] text-[13px] font-medium text-[#444]">
-                  Women&apos;s section
-                </span>
-              )}
-              {mosque.hasCarPark && (
-                <span className="rounded-full border border-card-border bg-white px-[13px] py-[7px] text-[13px] font-medium text-[#444]">
-                  Parking
-                </span>
+                <div className="flex items-center gap-[11px] rounded-[13px] border border-card-border bg-white px-[14px] py-[13px]">
+                  <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[9px] bg-[#F1F4F2]">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
+                      <circle cx="9" cy="7" r="3" stroke="#15803D" strokeWidth="1.9" />
+                      <path d="M3 21v-1a5 5 0 015-5h2a5 5 0 015 5v1" stroke="#15803D" strokeWidth="1.9" strokeLinecap="round" />
+                      <path d="M16 11a3 3 0 100-6" stroke="#15803D" strokeWidth="1.9" strokeLinecap="round" />
+                      <path d="M21 21v-1a5 5 0 00-4-4.9" stroke="#15803D" strokeWidth="1.9" strokeLinecap="round" />
+                    </svg>
+                  </span>
+                  <span className="text-[14px] font-semibold leading-tight tracking-[-0.01em] text-text-primary">Women&apos;s section</span>
+                </div>
               )}
               {mosque.hasDisabilityAccess && (
-                <span className="rounded-full border border-card-border bg-white px-[13px] py-[7px] text-[13px] font-medium text-[#444]">
-                  Wheelchair access
-                </span>
+                <div className="flex items-center gap-[11px] rounded-[13px] border border-card-border bg-white px-[14px] py-[13px]">
+                  <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[9px] bg-[#F1F4F2]">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="4" r="1.8" stroke="#15803D" strokeWidth="1.9" />
+                      <path d="M9 8h4v5h3l2 6" stroke="#15803D" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M13 13a6 6 0 11-5 9" stroke="#15803D" strokeWidth="1.9" strokeLinecap="round" />
+                    </svg>
+                  </span>
+                  <span className="text-[14px] font-semibold leading-tight tracking-[-0.01em] text-text-primary">Step-free access</span>
+                </div>
+              )}
+              {mosque.hasCarPark && (
+                <div className="flex items-center gap-[11px] rounded-[13px] border border-card-border bg-white px-[14px] py-[13px]">
+                  <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[9px] bg-[#F1F4F2]">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
+                      <rect x="4" y="4" width="16" height="16" rx="4" stroke="#15803D" strokeWidth="1.9" />
+                      <path d="M9.5 16V8h3a2.4 2.4 0 010 4.8H9.5" stroke="#15803D" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
+                  <span className="text-[14px] font-semibold leading-tight tracking-[-0.01em] text-text-primary">Parking</span>
+                </div>
               )}
             </div>
           </div>
+        )}
+
+        {/* Map */}
+        {mosque.lat !== null && mosque.lng !== null && (
+          <MosqueDetailMapClient lat={mosque.lat} lng={mosque.lng} name={mosque.name} />
         )}
 
         {/* Contact */}

@@ -102,6 +102,13 @@ export default function AboutPage() {
               </p>
             </div>
             <div className="px-4 py-[14px]">
+              <p className="text-[15px] font-semibold text-text-primary">Manual location</p>
+              <p className="mt-[3px] text-[13px] font-medium leading-relaxed text-text-secondary">
+                No GPS? Set a location manually — useful for planning ahead or checking
+                times for a different area.
+              </p>
+            </div>
+            <div className="px-4 py-[14px]">
               <p className="text-[15px] font-semibold text-text-primary">Favourites</p>
               <p className="mt-[3px] text-[13px] font-medium leading-relaxed text-text-secondary">
                 Sign in to save regular mosques. They&apos;ll appear at the top of the

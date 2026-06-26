@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Map, { Layer, Marker, Popup, Source } from 'react-map-gl/mapbox'
 import CrosshairIcon from '@/components/icons/CrosshairIcon'
+import MapPinIcon from '@/components/icons/MapPinIcon'
 import type { MapRef } from 'react-map-gl/mapbox'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import type { MosqueWithTimes } from '@/lib/db/queries'
@@ -12,11 +13,16 @@ type Props = {
   mosques: MosqueWithTimes[]
   userLat: number
   userLng: number
+  isManualLocation?: boolean
 }
 
-export default function MosqueMap({ mosques, userLat, userLng }: Props) {
+export default function MosqueMap({ mosques, userLat, userLng, isManualLocation = false }: Props) {
   const mapRef = useRef<MapRef>(null)
   const [selected, setSelected] = useState<MosqueWithTimes | null>(null)
+
+  useEffect(() => {
+    mapRef.current?.flyTo({ center: [userLng, userLat], zoom: 13, duration: 800 })
+  }, [userLat, userLng])
 
   const recenter = useCallback(() => {
     mapRef.current?.flyTo({ center: [userLng, userLat], zoom: 13, duration: 800 })
@@ -32,12 +38,16 @@ export default function MosqueMap({ mosques, userLat, userLng }: Props) {
         mapStyle="mapbox://styles/mapbox/streets-v12"
         onClick={() => setSelected(null)}
       >
-        {/* User location — blue pulsing dot */}
-        <Marker latitude={userLat} longitude={userLng} anchor="center">
-          <div className="relative flex h-5 w-5 items-center justify-center">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-60" />
-            <span className="relative inline-flex h-3 w-3 rounded-full bg-blue-500 ring-2 ring-white" />
-          </div>
+        {/* User / manual location marker */}
+        <Marker latitude={userLat} longitude={userLng} anchor={isManualLocation ? 'bottom' : 'center'}>
+          {isManualLocation ? (
+            <MapPinIcon className="h-7 w-7 text-text-primary drop-shadow" />
+          ) : (
+            <div className="relative flex h-5 w-5 items-center justify-center">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-60" />
+              <span className="relative inline-flex h-3 w-3 rounded-full bg-blue-500 ring-2 ring-white" />
+            </div>
+          )}
         </Marker>
 
         {/* Mosque pins */}
