@@ -15,6 +15,7 @@ type Props = {
   userLat: number
   userLng: number
   isManualLocation?: boolean
+  onLocate?: () => void
 }
 
 type PopupInfo = {
@@ -29,7 +30,7 @@ type ClusterSource = {
   getClusterExpansionZoom: (clusterId: number) => Promise<number>
 }
 
-export default function MosqueMap({ mosques, userLat, userLng, isManualLocation = false }: Props) {
+export default function MosqueMap({ mosques, userLat, userLng, isManualLocation = false, onLocate }: Props) {
   const mapRef = useRef<MapRef>(null)
   const [popup, setPopup] = useState<PopupInfo | null>(null)
   const [cursor, setCursor] = useState<string>('auto')
@@ -212,13 +213,13 @@ export default function MosqueMap({ mosques, userLat, userLng, isManualLocation 
         )}
       </Map>
 
-      {/* Recenter button */}
+      {/* Locate / recenter button */}
       <button
-        onClick={recenter}
+        onClick={() => { onLocate?.(); recenter() }}
         className="absolute left-2 top-2 flex h-9 w-9 items-center justify-center rounded-lg bg-white dark:bg-[#1D1B18] shadow-md hover:bg-gray-50 dark:hover:bg-[#26231F]"
-        aria-label="Recenter map"
+        aria-label="Snap to current location"
       >
-        <CrosshairIcon className="h-5 w-5 text-gray-700 dark:text-text-secondary" />
+        <CrosshairIcon className={`h-5 w-5 ${isManualLocation ? 'text-text-primary' : 'text-gray-700 dark:text-text-secondary'}`} />
       </button>
     </div>
   )

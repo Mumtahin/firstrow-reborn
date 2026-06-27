@@ -100,6 +100,7 @@ export default function HomeShell({ mosques, favouriteIds, userId, userName, use
         favouriteIds={favouriteIds}
         userId={userId}
         location={effectiveLocation}
+        onLocate={handleUseGPS}
       />
       <LocationSheet
         open={sheetOpen}

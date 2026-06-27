@@ -592,7 +592,42 @@ const mosques = [
     contact: { website: null, phone: '07909594068', email: null },
     amenities: { hasWomensSpace: null, hasCarPark: null, hasDisabilityAccess: null },
     source: null,
-  }
+  },
+  {
+    mosque: { name: 'Hind Grove Cultural And Community Association', slug: 'hind-grove-cultural-and-community-association', status: 'active' as const },
+    location: { addressLine1: '162 Pigott St', addressLine2: null, town: 'London', postcode: 'E14 7DW', lat: 51.5131187, lng: -0.0254038 },
+    contact: { website: 'http://www.hindgrovemasjid.org.uk', phone: null, email: null },
+    amenities: { hasWomensSpace: null, hasCarPark: null, hasDisabilityAccess: null },
+    source: null,
+  },
+  {
+    mosque: { name: 'Locksley Estate Cultural Association & Mosque', slug: 'locksley-estate-cultural-association-and-mosque', status: 'active' as const },
+    location: { addressLine1: 'Lydbrook Place', addressLine2: null, town: 'London', postcode: 'E14 7TU', lat: 51.5140449, lng: -0.03297265 },
+    contact: { website: null, phone: null, email: null },
+    amenities: { hasWomensSpace: null, hasCarPark: null, hasDisabilityAccess: null },
+    source: null,
+  },
+  {
+    mosque: { name: 'Coventry Cross Mosque', slug: 'coventry-cross-mosque', status: 'active' as const },
+    location: { addressLine1: '6 Broxbourne House', addressLine2: 'Devas St', town: 'London', postcode: 'E3 3LJ', lat: 51.5230611, lng: -0.0146012 },
+    contact: { website: 'https://www.coventrycrossmosque.co.uk', phone: '02079872133', email: null },
+    amenities: { hasWomensSpace: null, hasCarPark: null, hasDisabilityAccess: null },
+    source: null,
+  },
+  {
+    mosque: { name: 'Weaversfield Muslim Prayer Hall', slug: 'weaversfield-muslim-prayer-hall', status: 'active' as const },
+    location: { addressLine1: '3a, Railway Arches', addressLine2: 'Brady St', town: 'London', postcode: 'E1 5DT', lat: 51.5236410, lng: -0.0603727 },
+    contact: { website: 'https://weaversfield-muslim-prayer-hall.ueniweb.com', phone: '07401503097', email: 'weaversfieldmasjid@gmail.com' },
+    amenities: { hasWomensSpace: null, hasCarPark: null, hasDisabilityAccess: null },
+    source: null,
+  },
+  {
+    mosque: { name: 'Westferry Community Masjid', slug: 'west-ferry-community-masjid', status: 'active' as const },
+    location: { addressLine1: '2 The Quarterdeck', addressLine2: null, town: 'London', postcode: 'E14 8SJ', lat: 51.4982905, lng: -0.0245470 },
+    contact: { website: null, phone: '07825373325', email: null },
+    amenities: { hasWomensSpace: null, hasCarPark: null, hasDisabilityAccess: null },
+    source: null,
+  },
 ]
 
 // Seed

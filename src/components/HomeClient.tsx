@@ -49,9 +49,10 @@ type Props = {
   favouriteIds: number[]
   userId: string | null
   location: ClientLocation
+  onLocate?: () => void
 }
 
-export default function HomeClient({ mosques, favouriteIds, userId, location }: Props) {
+export default function HomeClient({ mosques, favouriteIds, userId, location, onLocate }: Props) {
   const [now, setNow] = useState(() => new Date())
   const [selectedPrayer, setSelectedPrayer] = useState<Prayer | null>(null)
   const favSet = new Set(favouriteIds)
@@ -90,7 +91,7 @@ export default function HomeClient({ mosques, favouriteIds, userId, location }: 
       )}
       {location.status === 'ready' && (
         <div className="mb-4 px-4">
-          <MosqueMap mosques={mosques} userLat={location.lat} userLng={location.lng} isManualLocation={location.isManual} />
+          <MosqueMap mosques={mosques} userLat={location.lat} userLng={location.lng} isManualLocation={location.isManual} onLocate={onLocate} />
         </div>
       )}
       {location.status === 'denied' && (
