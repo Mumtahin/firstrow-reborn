@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import ThemeProvider from '@/components/ThemeProvider'
+import InstallBanner from '@/components/InstallBanner'
 import './globals.css'
 
 const geistSans = Geist({
@@ -21,8 +22,14 @@ export const metadata: Metadata = {
     template: '%s | FirstRow',
   },
   description: 'Find your next jamaat nearby',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'FirstRow',
+  },
   icons: {
-    icon: '/apple-touch-icon.png',
+    icon: '/icons/icon-192x192.png',
     apple: '/apple-touch-icon.png',
   },
 }
@@ -37,6 +44,7 @@ export default function RootLayout({
       <body className="flex min-h-full w-full flex-col overflow-x-hidden bg-app-bg text-text-primary">
         <ThemeProvider>
           {children}
+          <InstallBanner />
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />
