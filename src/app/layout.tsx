@@ -23,9 +23,6 @@ export const metadata: Metadata = {
     template: '%s | FirstRow',
   },
   description: 'Find the nearest mosque and see live jamaat times with countdowns. Updated daily for Tower Hamlets, East London and nearby areas.',
-  verification: {
-    google: 'ZtenvBj_BmE6553N6CTdAQcxcsftKK-hbF_HwMKyOFU',
-  },
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,

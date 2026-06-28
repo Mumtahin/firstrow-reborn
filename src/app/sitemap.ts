@@ -3,7 +3,7 @@ import { db } from '@/lib/db'
 import { mosque } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 
-const BASE_URL = 'https://firstrow.vercel.app'
+const BASE_URL = 'https://firstrow.uk'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const mosques = await db

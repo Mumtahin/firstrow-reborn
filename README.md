@@ -2,7 +2,7 @@
 
 Find your next jamaat nearby. A mobile-first web app for Muslims to discover nearby mosques and see upcoming jamaat (congregation) times — ranked by how likely you are to make it in time.
 
-Live at [firstrow-reborn.vercel.app](https://firstrow-reborn.vercel.app)
+Live at [firstrow.uk](https://firstrow.uk)
 
 ---
 
