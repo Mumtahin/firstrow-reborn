@@ -19,10 +19,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: 'FirstRow | Find your next jamaat nearby',
+    default: 'Mosque Jamaat Times Near You | FirstRow',
     template: '%s | FirstRow',
   },
-  description: 'Find your next jamaat nearby',
+  description: 'Find the nearest mosque and see live jamaat times with countdowns. Updated daily for Tower Hamlets, East London and nearby areas.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,

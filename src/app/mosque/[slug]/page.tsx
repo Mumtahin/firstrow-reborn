@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { auth } from '@/auth'
@@ -97,6 +98,27 @@ function getPrayerRowState(
   if (thisIdx < nextIdx) return 'past'
   if (thisIdx === nextIdx) return 'current'
   return 'upcoming'
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
+  const { slug } = await params
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/London' })
+  const mosque = await getMosqueBySlug(slug, today)
+  if (!mosque) return {}
+
+  const area = mosque.postcode?.split(' ')[0] ?? mosque.town
+  const title = `${mosque.name} Jamaat Times Today | ${mosque.town} — FirstRow`
+  const description = `See ${mosque.name}'s next Jamaat time, live countdown, and directions. Updated daily for ${mosque.town}, ${area}.`
+
+  return {
+    title: { absolute: title },
+    description,
+    openGraph: { title, description },
+  }
 }
 
 export default async function MosqueDetailPage({

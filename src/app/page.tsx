@@ -1,6 +1,12 @@
+import type { Metadata } from 'next'
 import { getMosquesWithPrayerTimes, getFavouriteIds } from '@/lib/db/queries'
 import HomeShell from '@/components/HomeShell'
 import { auth } from '@/auth'
+
+export const metadata: Metadata = {
+  title: { absolute: 'Mosque Jamaat Times Near You | FirstRow' },
+  description: 'Find the nearest mosque and see live jamaat times with countdowns. Updated daily for Tower Hamlets, East London and nearby areas.',
+}
 
 function dateString(daysFromNow: number): string {
   const d = new Date()
