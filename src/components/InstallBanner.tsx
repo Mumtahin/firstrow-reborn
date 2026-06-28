@@ -70,10 +70,7 @@ export default function InstallBanner() {
         {/* Top row: icon + text + dismiss */}
         <div className="mb-[13px] flex items-center gap-3">
           {/* App icon */}
-          <div className="relative h-11 w-11 shrink-0">
-            <img src="/icons/icon-192x192.png" alt="" className="h-11 w-11 rounded-[12px]" />
-            <span className="absolute right-[9px] top-[9px] h-[7px] w-[7px] rounded-full bg-[#22C55E] shadow-[0_0_0_2px_white]" />
-          </div>
+          <img src="/icons/icon-192x192.png" alt="" className="h-11 w-11 shrink-0 rounded-[12px]" />
 
           {/* Text */}
           <div className="flex min-w-0 flex-1 flex-col gap-[2px]">
