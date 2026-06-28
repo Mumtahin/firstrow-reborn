@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm'
+import { and, eq, like, or } from 'drizzle-orm'
 import { alias } from 'drizzle-orm/pg-core'
 import { unstable_cache } from 'next/cache'
 import { db } from './index'
@@ -142,6 +142,40 @@ export async function getFavouritedMosques(
 
   return rows as MosqueWithTimes[]
 }
+
+export type MosqueListing = {
+  id: number
+  name: string
+  slug: string
+  addressLine1: string
+  town: string
+  postcode: string
+}
+
+/** Fetches name, slug, and address for all active mosques in the given postcode districts.
+ *  Does not include prayer times — use on listing/area pages to avoid exposing raw data. */
+export const getMosquesByDistricts = unstable_cache(
+  async (districts: string[]): Promise<MosqueListing[]> => {
+    const districtConditions = districts.map((d) => like(location.postcode, `${d} %`))
+
+    const rows = await db
+      .select({
+        id: mosque.id,
+        name: mosque.name,
+        slug: mosque.slug,
+        addressLine1: location.addressLine1,
+        town: location.town,
+        postcode: location.postcode,
+      })
+      .from(mosque)
+      .innerJoin(location, eq(location.mosqueId, mosque.id))
+      .where(and(eq(mosque.status, 'active'), or(...districtConditions)))
+
+    return rows as MosqueListing[]
+  },
+  ['mosques-by-districts'],
+  { tags: ['mosques'], revalidate: 3600 }
+)
 
 /** Fetches a single active mosque with full detail and prayer times for a given date. */
 export const getMosqueBySlug = unstable_cache(
