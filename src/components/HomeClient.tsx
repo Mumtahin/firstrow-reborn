@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { haversineDistance } from '@/lib/utils/distance'
 import { getNextJamaat, parseTime, toUKMinutes } from '@/lib/utils/getNextJamaat'
@@ -8,6 +8,7 @@ import type { Prayer, NextJamaatResult } from '@/lib/utils/getNextJamaat'
 import type { MosqueWithTimes } from '@/lib/db/queries'
 import type { ClientLocation } from './HomeShell'
 import MosqueCard from './MosqueCard'
+import MosqueCardSkeleton from './MosqueCardSkeleton'
 import StarIcon from './icons/StarIcon'
 import MapPinIcon from './icons/MapPinIcon'
 
@@ -22,7 +23,7 @@ const PRAYER_PILLS: { key: Prayer; label: string }[] = [
 ]
 
 function getPillLabel(key: Prayer, label: string): string {
-  if (key === 'zuhr' && new Date().getDay() === 5) return "Jummah"
+  if (key === 'zuhr' && new Date().getDay() === 5) return 'Jummah'
   return label
 }
 
@@ -44,6 +45,11 @@ function getSpecificPrayerJamaat(
   return null
 }
 
+type EnrichedMosque = MosqueWithTimes & {
+  distance: number | null
+  nextJamaat: NextJamaatResult | null
+}
+
 type Props = {
   mosques: MosqueWithTimes[]
   favouriteIds: number[]
@@ -52,38 +58,103 @@ type Props = {
   onLocate?: () => void
 }
 
+const PAGE_SIZE = 6
+const SKELETON_COUNT = 3
+
 export default function HomeClient({ mosques, favouriteIds, userId, location, onLocate }: Props) {
   const [now, setNow] = useState(() => new Date())
   const [selectedPrayer, setSelectedPrayer] = useState<Prayer | null>(null)
+
+  // Paginated nearby list — fetched from API
+  const [nearbyItems, setNearbyItems] = useState<MosqueWithTimes[]>([])
+  const [initialLoading, setInitialLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(false)
+  const offsetRef = useRef(0)
+
   const favSet = new Set(favouriteIds)
 
+  // Minute clock for countdowns
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 60_000)
     return () => clearInterval(id)
   }, [])
 
-  const enriched = mosques
-    .map((m) => ({
+  // Re-fetch when location resolves or coordinates change
+  const locationKey =
+    location.status === 'ready'
+      ? `${location.lat.toFixed(3)},${location.lng.toFixed(3)}`
+      : location.status
+
+  useEffect(() => {
+    if (location.status === 'pending') return
+    setNearbyItems([])
+    setInitialLoading(true)
+    setHasMore(false)
+    offsetRef.current = 0
+    fetchPage(0, location)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locationKey])
+
+  async function fetchPage(fetchOffset: number, loc: ClientLocation) {
+    const params = new URLSearchParams({
+      offset: String(fetchOffset),
+      limit: String(PAGE_SIZE),
+    })
+    if (loc.status === 'ready') {
+      params.set('lat', String(loc.lat))
+      params.set('lng', String(loc.lng))
+    }
+
+    try {
+      const res = await fetch(`/api/mosques/nearby?${params}`)
+      const data: { items: MosqueWithTimes[]; hasMore: boolean } = await res.json()
+      setNearbyItems((prev) => (fetchOffset === 0 ? data.items : [...prev, ...data.items]))
+      setHasMore(data.hasMore)
+      offsetRef.current = fetchOffset + PAGE_SIZE
+    } catch {
+      // silently fail — existing items remain visible
+    } finally {
+      setInitialLoading(false)
+      setLoadingMore(false)
+    }
+  }
+
+  function handleLoadMore() {
+    setLoadingMore(true)
+    fetchPage(offsetRef.current, location)
+  }
+
+  // Enrich a mosque with distance + nextJamaat at render time
+  function enrich(m: MosqueWithTimes): EnrichedMosque {
+    return {
       ...m,
-      distance: location.status === 'ready'
-        ? haversineDistance(location.lat, location.lng, m.lat, m.lng)
-        : null,
+      distance:
+        location.status === 'ready'
+          ? haversineDistance(location.lat, location.lng, m.lat, m.lng)
+          : null,
       nextJamaat: selectedPrayer
         ? getSpecificPrayerJamaat(m, selectedPrayer, now)
         : getNextJamaat(m, now, m.tomorrowFajrJamaat),
-    }))
-    .filter((m) => !selectedPrayer || m.nextJamaat !== null)
-    .sort((a, b) => {
-      if (a.distance !== null && b.distance !== null) return a.distance - b.distance
-      return 0
-    })
+    }
+  }
 
-  const favourites = enriched.filter((m) => favSet.has(m.id))
-  const nearby = enriched.filter((m) => !favSet.has(m.id))
+  // Favourites always come from the full server-fetched prop so they're never missing
+  const favourites = mosques
+    .filter((m) => favSet.has(m.id))
+    .map(enrich)
+    .filter((m) => !selectedPrayer || m.nextJamaat !== null)
+
+  // Nearby: API-fetched, favourites excluded, prayer-filtered client-side
+  const nearby = nearbyItems
+    .filter((m) => !favSet.has(m.id))
+    .map(enrich)
+    .filter((m) => !selectedPrayer || m.nextJamaat !== null)
 
   return (
     <div className="flex flex-col">
-      {/* Map / location states */}
+
+      {/* Map */}
       {location.status === 'pending' && (
         <div className="mx-4 mb-4 flex h-48 items-center justify-center rounded-2xl bg-card-divider">
           <div className="h-6 w-6 animate-spin rounded-full border-2 border-card-border-fav border-t-text-tertiary" />
@@ -91,7 +162,13 @@ export default function HomeClient({ mosques, favouriteIds, userId, location, on
       )}
       {location.status === 'ready' && (
         <div className="mb-4 px-4">
-          <MosqueMap mosques={mosques} userLat={location.lat} userLng={location.lng} isManualLocation={location.isManual} onLocate={onLocate} />
+          <MosqueMap
+            mosques={mosques}
+            userLat={location.lat}
+            userLng={location.lng}
+            isManualLocation={location.isManual}
+            onLocate={onLocate}
+          />
         </div>
       )}
       {location.status === 'denied' && (
@@ -133,7 +210,7 @@ export default function HomeClient({ mosques, favouriteIds, userId, location, on
       {/* Sections */}
       <div className="flex flex-col gap-[22px] px-4 pb-7 pt-1">
 
-        {/* Favourites section — only shown when signed in and has favourites */}
+        {/* Favourites — always fully loaded from server props */}
         {userId && favourites.length > 0 && (
           <div className="flex flex-col gap-[10px]">
             <div className="flex items-center gap-[7px] px-0.5">
@@ -157,35 +234,60 @@ export default function HomeClient({ mosques, favouriteIds, userId, location, on
           </div>
         )}
 
-        {/* Nearby section */}
-        {nearby.length > 0 ? (
-          <div className="flex flex-col gap-[10px]">
-            {userId && favourites.length > 0 && (
-              <div className="flex items-center gap-[7px] px-0.5">
-                <MapPinIcon className="h-[13px] w-[13px] text-text-tertiary" />
-                <span className="text-[12px] font-bold uppercase tracking-[0.05em] text-text-tertiary">
-                  Nearby
-                </span>
-              </div>
-            )}
-            {nearby.map((m) => (
-              <MosqueCard
-                key={m.id}
-                name={m.name}
-                slug={m.slug}
-                lat={m.lat}
-                lng={m.lng}
-                distance={m.distance}
-                nextJamaat={m.nextJamaat}
-                isFavourited={false}
-              />
-            ))}
-          </div>
-        ) : selectedPrayer && favourites.length === 0 && (
-          <p className="px-0.5 text-[13px] font-medium text-text-tertiary">
-            No mosques with upcoming {getPillLabel(selectedPrayer!, PRAYER_PILLS.find(p => p.key === selectedPrayer)?.label ?? '')} nearby.
-          </p>
-        )}
+        {/* Nearby — API-paginated */}
+        <div className="flex flex-col gap-[10px]">
+          {userId && favourites.length > 0 && (
+            <div className="flex items-center gap-[7px] px-0.5">
+              <MapPinIcon className="h-[13px] w-[13px] text-text-tertiary" />
+              <span className="text-[12px] font-bold uppercase tracking-[0.05em] text-text-tertiary">
+                Nearby
+              </span>
+            </div>
+          )}
+
+          {/* Skeletons while first page loads */}
+          {initialLoading && Array.from({ length: SKELETON_COUNT }).map((_, i) => (
+            <MosqueCardSkeleton key={i} />
+          ))}
+
+          {/* Loaded cards */}
+          {!initialLoading && nearby.map((m) => (
+            <MosqueCard
+              key={m.id}
+              name={m.name}
+              slug={m.slug}
+              lat={m.lat}
+              lng={m.lng}
+              distance={m.distance}
+              nextJamaat={m.nextJamaat}
+              isFavourited={false}
+            />
+          ))}
+
+          {/* Skeletons while next page loads */}
+          {loadingMore && Array.from({ length: SKELETON_COUNT }).map((_, i) => (
+            <MosqueCardSkeleton key={`more-${i}`} />
+          ))}
+
+          {/* Load more */}
+          {!initialLoading && !loadingMore && hasMore && (
+            <button
+              onClick={handleLoadMore}
+              className="mt-1 w-full rounded-2xl border border-card-border bg-white dark:bg-[#1D1B18] py-[13px] text-[14px] font-semibold text-text-secondary transition-colors duration-[200ms] ease-out hover:text-text-primary active:opacity-70"
+            >
+              Load more
+            </button>
+          )}
+
+          {/* Empty state when prayer filter matches nothing */}
+          {!initialLoading && nearby.length === 0 && selectedPrayer && favourites.length === 0 && (
+            <p className="px-0.5 text-[13px] font-medium text-text-tertiary">
+              No mosques with upcoming{' '}
+              {getPillLabel(selectedPrayer, PRAYER_PILLS.find((p) => p.key === selectedPrayer)?.label ?? '')}{' '}
+              nearby.
+            </p>
+          )}
+        </div>
 
       </div>
     </div>
