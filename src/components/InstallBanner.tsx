@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { track } from '@vercel/analytics'
 
 const DISMISSED_KEY = 'firstrow_install_dismissed'
 
@@ -51,7 +52,10 @@ export default function InstallBanner() {
     if (!deferredPrompt) return
     await deferredPrompt.prompt()
     const { outcome } = await deferredPrompt.userChoice
-    if (outcome === 'accepted') setVisible(false)
+    if (outcome === 'accepted') {
+      track('pwa_installed')
+      setVisible(false)
+    }
     setDeferredPrompt(null)
   }
 

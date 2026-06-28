@@ -4,6 +4,7 @@ import { auth } from '@/auth'
 import { getMosqueBySlug, getFavouriteIds } from '@/lib/db/queries'
 import { getNextJamaat } from '@/lib/utils/getNextJamaat'
 import FavouriteButton from '@/components/FavouriteButton'
+import ShareButton from '@/components/ShareButton'
 import ChevronLeftIcon from '@/components/icons/ChevronLeftIcon'
 import NavigateIcon from '@/components/icons/NavigateIcon'
 import PhoneIcon from '@/components/icons/PhoneIcon'
@@ -143,12 +144,18 @@ export default async function MosqueDetailPage({
         >
           <ChevronLeftIcon className="h-[15px] w-[15px] text-text-primary" />
         </Link>
-        <FavouriteButton
-          mosqueId={mosque.id}
-          isFavourited={isFavourited}
-          userId={userId}
-          className="h-[38px] w-[38px] rounded-full border border-card-border bg-white dark:bg-[#1D1B18]"
-        />
+        <div className="flex items-center gap-2">
+          <ShareButton
+            name={mosque.name}
+            className="h-[38px] w-[38px] rounded-full border border-card-border bg-white dark:bg-[#1D1B18]"
+          />
+          <FavouriteButton
+            mosqueId={mosque.id}
+            isFavourited={isFavourited}
+            userId={userId}
+            className="h-[38px] w-[38px] rounded-full border border-card-border bg-white dark:bg-[#1D1B18]"
+          />
+        </div>
       </div>
 
       <div className="flex flex-col gap-[18px] px-4 pb-7">
