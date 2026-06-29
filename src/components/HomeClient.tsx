@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { haversineDistance } from '@/lib/utils/distance'
 import { getNextJamaat, parseTime, toUKMinutes } from '@/lib/utils/getNextJamaat'
@@ -64,6 +64,26 @@ const SKELETON_COUNT = 3
 export default function HomeClient({ mosques, favouriteIds, userId, location, onLocate }: Props) {
   const [now, setNow] = useState(() => new Date())
   const [selectedPrayer, setSelectedPrayer] = useState<Prayer | null>(null)
+
+  // Prayers that still have at least one mosque offering an upcoming jamaat
+  const availablePrayers = useMemo(
+    () =>
+      new Set(
+        PRAYER_PILLS
+          .filter(({ key }) => mosques.some((m) => getSpecificPrayerJamaat(m, key, now) !== null))
+          .map(({ key }) => key)
+      ),
+    // Re-compute every minute (now) and whenever the mosque list changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [mosques, now]
+  )
+
+  // If the selected prayer lapses while the user is on the page, clear the filter
+  useEffect(() => {
+    if (selectedPrayer && !availablePrayers.has(selectedPrayer)) {
+      setSelectedPrayer(null)
+    }
+  }, [selectedPrayer, availablePrayers])
 
   // Paginated nearby list — fetched from API
   const [nearbyItems, setNearbyItems] = useState<MosqueWithTimes[]>([])
@@ -154,6 +174,33 @@ export default function HomeClient({ mosques, favouriteIds, userId, location, on
   return (
     <div className="flex flex-col">
 
+      {/* Prayer filter pills — above the map */}
+      <div className="flex gap-[7px] overflow-x-auto px-4 pb-3 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        <button
+          onClick={() => setSelectedPrayer(null)}
+          className={`shrink-0 rounded-full px-[14px] py-[7px] text-[13px] font-semibold transition-colors ${
+            selectedPrayer === null
+              ? 'bg-text-primary text-[#FAFAF8] dark:text-[#16130F]'
+              : 'border border-card-border bg-white dark:bg-[#1D1B18] text-text-secondary'
+          }`}
+        >
+          Next
+        </button>
+        {PRAYER_PILLS.filter(({ key }) => availablePrayers.has(key)).map(({ key, label }) => (
+          <button
+            key={key}
+            onClick={() => setSelectedPrayer(selectedPrayer === key ? null : key)}
+            className={`shrink-0 rounded-full px-[14px] py-[7px] text-[13px] font-semibold transition-colors ${
+              selectedPrayer === key
+                ? 'bg-text-primary text-[#FAFAF8] dark:text-[#16130F]'
+                : 'border border-card-border bg-white dark:bg-[#1D1B18] text-text-secondary'
+            }`}
+          >
+            {getPillLabel(key, label)}
+          </button>
+        ))}
+      </div>
+
       {/* Map */}
       {location.status === 'pending' && (
         <div className="mx-4 mb-4 flex h-48 items-center justify-center rounded-2xl bg-card-divider">
@@ -179,33 +226,6 @@ export default function HomeClient({ mosques, favouriteIds, userId, location, on
           </p>
         </div>
       )}
-
-      {/* Prayer filter pills */}
-      <div className="flex gap-[7px] overflow-x-auto px-4 pb-3 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-        <button
-          onClick={() => setSelectedPrayer(null)}
-          className={`shrink-0 rounded-full px-[14px] py-[7px] text-[13px] font-semibold transition-colors ${
-            selectedPrayer === null
-              ? 'bg-text-primary text-[#FAFAF8] dark:text-[#16130F]'
-              : 'border border-card-border bg-white dark:bg-[#1D1B18] text-text-secondary'
-          }`}
-        >
-          Next
-        </button>
-        {PRAYER_PILLS.map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => setSelectedPrayer(selectedPrayer === key ? null : key)}
-            className={`shrink-0 rounded-full px-[14px] py-[7px] text-[13px] font-semibold transition-colors ${
-              selectedPrayer === key
-                ? 'bg-text-primary text-[#FAFAF8] dark:text-[#16130F]'
-                : 'border border-card-border bg-white dark:bg-[#1D1B18] text-text-secondary'
-            }`}
-          >
-            {getPillLabel(key, label)}
-          </button>
-        ))}
-      </div>
 
       {/* Sections */}
       <div className="flex flex-col gap-[22px] px-4 pb-7 pt-1">
