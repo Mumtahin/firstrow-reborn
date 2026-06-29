@@ -81,19 +81,17 @@ export default function FilterSheet({ open, filters, matchCount, onChange, onClo
         style={{ maxHeight: '85dvh' }}
       >
         {/* Drag handle */}
-        <div className="mx-auto mb-5 mt-0 h-1 w-10 rounded-full bg-[#E2E2DE] dark:bg-[#3A3630]" />
+        <div className="mx-auto mb-5 mt-3 h-1 w-10 rounded-full bg-[#E2E2DE] dark:bg-[#3A3630]" />
 
         {/* Header */}
         <div className="flex items-center justify-between px-4 pb-[6px]">
           <span className="text-[19px] font-bold tracking-[-0.01em] text-text-primary">Filters</span>
-          {activeCount > 0 && (
-            <button
-              onClick={reset}
-              className="text-[14px] font-semibold text-text-tertiary"
-            >
-              Reset
-            </button>
-          )}
+          <button
+            onClick={reset}
+            className="text-[14px] font-semibold text-text-tertiary"
+          >
+            Reset
+          </button>
         </div>
 
         {/* Body */}
