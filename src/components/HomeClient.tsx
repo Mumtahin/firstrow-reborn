@@ -9,6 +9,8 @@ import type { MosqueWithTimes } from '@/lib/db/queries'
 import type { ClientLocation } from './HomeShell'
 import MosqueCard from './MosqueCard'
 import MosqueCardSkeleton from './MosqueCardSkeleton'
+import FilterSheet from './FilterSheet'
+import type { AmenityFilters } from './FilterSheet'
 import StarIcon from './icons/StarIcon'
 import MapPinIcon from './icons/MapPinIcon'
 
@@ -64,6 +66,12 @@ const SKELETON_COUNT = 3
 export default function HomeClient({ mosques, favouriteIds, userId, location, onLocate }: Props) {
   const [now, setNow] = useState(() => new Date())
   const [selectedPrayer, setSelectedPrayer] = useState<Prayer | null>(null)
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const [amenityFilters, setAmenityFilters] = useState<AmenityFilters>({
+    womensSpace: false,
+    parking: false,
+    stepFree: false,
+  })
 
   // Prayers that still have at least one mosque offering an upcoming jamaat
   const availablePrayers = useMemo(
@@ -159,47 +167,94 @@ export default function HomeClient({ mosques, favouriteIds, userId, location, on
     }
   }
 
+  function applyAmenityFilters<T extends MosqueWithTimes>(list: T[]): T[] {
+    return list
+      .filter((m) => !amenityFilters.womensSpace || m.hasWomensSpace === true)
+      .filter((m) => !amenityFilters.parking || m.hasCarPark === true)
+      .filter((m) => !amenityFilters.stepFree || m.hasDisabilityAccess === true)
+  }
+
   // Favourites always come from the full server-fetched prop so they're never missing
-  const favourites = mosques
-    .filter((m) => favSet.has(m.id))
-    .map(enrich)
-    .filter((m) => !selectedPrayer || m.nextJamaat !== null)
+  const favourites = applyAmenityFilters(
+    mosques
+      .filter((m) => favSet.has(m.id))
+      .map(enrich)
+      .filter((m) => !selectedPrayer || m.nextJamaat !== null)
+  )
 
   // Nearby: API-fetched, favourites excluded, prayer-filtered client-side
-  const nearby = nearbyItems
-    .filter((m) => !favSet.has(m.id))
-    .map(enrich)
-    .filter((m) => !selectedPrayer || m.nextJamaat !== null)
+  const nearby = applyAmenityFilters(
+    nearbyItems
+      .filter((m) => !favSet.has(m.id))
+      .map(enrich)
+      .filter((m) => !selectedPrayer || m.nextJamaat !== null)
+  )
+
+  const activeFilterCount = [amenityFilters.womensSpace, amenityFilters.parking, amenityFilters.stepFree].filter(Boolean).length
 
   return (
     <div className="flex flex-col">
 
-      {/* Prayer filter pills — above the map */}
-      <div className="flex gap-[7px] overflow-x-auto px-4 pb-3 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-        <button
-          onClick={() => setSelectedPrayer(null)}
-          className={`shrink-0 rounded-full px-[14px] py-[7px] text-[13px] font-semibold transition-colors ${
-            selectedPrayer === null
-              ? 'bg-text-primary text-[#FAFAF8] dark:text-[#16130F]'
-              : 'border border-card-border bg-white dark:bg-[#1D1B18] text-text-secondary'
-          }`}
-        >
-          Next
-        </button>
-        {PRAYER_PILLS.filter(({ key }) => availablePrayers.has(key)).map(({ key, label }) => (
+      {/* Prayer pills + Filters button */}
+      <div className="flex items-center gap-[10px] px-4 pb-3">
+        {/* Scrollable prayer pills */}
+        <div className="flex min-w-0 flex-1 gap-[7px] overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           <button
-            key={key}
-            onClick={() => setSelectedPrayer(selectedPrayer === key ? null : key)}
+            onClick={() => setSelectedPrayer(null)}
             className={`shrink-0 rounded-full px-[14px] py-[7px] text-[13px] font-semibold transition-colors ${
-              selectedPrayer === key
+              selectedPrayer === null
                 ? 'bg-text-primary text-[#FAFAF8] dark:text-[#16130F]'
                 : 'border border-card-border bg-white dark:bg-[#1D1B18] text-text-secondary'
             }`}
           >
-            {getPillLabel(key, label)}
+            Next
           </button>
-        ))}
+          {PRAYER_PILLS.filter(({ key }) => availablePrayers.has(key)).map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setSelectedPrayer(selectedPrayer === key ? null : key)}
+              className={`shrink-0 rounded-full px-[14px] py-[7px] text-[13px] font-semibold transition-colors ${
+                selectedPrayer === key
+                  ? 'bg-text-primary text-[#FAFAF8] dark:text-[#16130F]'
+                  : 'border border-card-border bg-white dark:bg-[#1D1B18] text-text-secondary'
+              }`}
+            >
+              {getPillLabel(key, label)}
+            </button>
+          ))}
+        </div>
+
+        {/* Filters button */}
+        <button
+          onClick={() => setFiltersOpen(true)}
+          className={`shrink-0 inline-flex items-center gap-[6px] rounded-full px-[13px] py-[7px] text-[13px] font-semibold transition-colors ${
+            activeFilterCount > 0
+              ? 'bg-text-primary text-[#FAFAF8] dark:text-[#16130F]'
+              : 'border border-card-border bg-white dark:bg-[#1D1B18] text-text-secondary'
+          }`}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="M3 8h11M19 8h2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            <circle cx="16.5" cy="8" r="2.5" stroke="currentColor" strokeWidth="2" />
+            <path d="M3 16h4M10 16h11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            <circle cx="8.5" cy="16" r="2.5" stroke="currentColor" strokeWidth="2" />
+          </svg>
+          Filters
+          {activeFilterCount > 0 && (
+            <span className="inline-flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-[#FAFAF8] dark:bg-[#16130F] px-[4px] text-[11px] font-bold text-text-primary dark:text-[#FAFAF8]">
+              {activeFilterCount}
+            </span>
+          )}
+        </button>
       </div>
+
+      <FilterSheet
+        open={filtersOpen}
+        filters={amenityFilters}
+        matchCount={favourites.length + nearby.length}
+        onChange={setAmenityFilters}
+        onClose={() => setFiltersOpen(false)}
+      />
 
       {/* Map */}
       {location.status === 'pending' && (

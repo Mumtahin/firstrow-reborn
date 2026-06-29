@@ -13,6 +13,9 @@ export type MosqueWithTimes = {
   addressLine1: string
   town: string
   postcode: string
+  hasWomensSpace: boolean | null
+  hasCarPark: boolean | null
+  hasDisabilityAccess: boolean | null
   fajrJamaat: string | null
   zuhrJamaat: string | null
   asrJamaat: string | null
@@ -37,6 +40,9 @@ export const getMosquesWithPrayerTimes = unstable_cache(
         addressLine1: location.addressLine1,
         town: location.town,
         postcode: location.postcode,
+        hasWomensSpace: amenities.hasWomensSpace,
+        hasCarPark: amenities.hasCarPark,
+        hasDisabilityAccess: amenities.hasDisabilityAccess,
         fajrJamaat: prayerTimes.fajrJamaat,
         zuhrJamaat: prayerTimes.zuhrJamaat,
         asrJamaat: prayerTimes.asrJamaat,
@@ -46,6 +52,7 @@ export const getMosquesWithPrayerTimes = unstable_cache(
       })
       .from(mosque)
       .innerJoin(location, eq(location.mosqueId, mosque.id))
+      .leftJoin(amenities, eq(amenities.mosqueId, mosque.id))
       .leftJoin(
         prayerTimes,
         and(eq(prayerTimes.mosqueId, mosque.id), eq(prayerTimes.date, date))
@@ -120,6 +127,9 @@ export async function getFavouritedMosques(
       addressLine1: location.addressLine1,
       town: location.town,
       postcode: location.postcode,
+      hasWomensSpace: amenities.hasWomensSpace,
+      hasCarPark: amenities.hasCarPark,
+      hasDisabilityAccess: amenities.hasDisabilityAccess,
       fajrJamaat: prayerTimes.fajrJamaat,
       zuhrJamaat: prayerTimes.zuhrJamaat,
       asrJamaat: prayerTimes.asrJamaat,
@@ -130,6 +140,7 @@ export async function getFavouritedMosques(
     .from(favourite)
     .innerJoin(mosque, and(eq(mosque.id, favourite.mosqueId), eq(mosque.status, 'active')))
     .innerJoin(location, eq(location.mosqueId, mosque.id))
+    .leftJoin(amenities, eq(amenities.mosqueId, mosque.id))
     .leftJoin(
       prayerTimes,
       and(eq(prayerTimes.mosqueId, mosque.id), eq(prayerTimes.date, date))
