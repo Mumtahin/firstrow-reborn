@@ -13,7 +13,6 @@ import {
 import type { Prayer, EnrichedMosque } from '@/lib/utils/prayerPills'
 import type { ClientLocation } from './HomeShell'
 import MosqueCard from './MosqueCard'
-import MosqueCardSkeleton from './MosqueCardSkeleton'
 import FilterSheet from './FilterSheet'
 import type { AmenityFilters } from './FilterSheet'
 import StarIcon from './icons/StarIcon'
@@ -30,7 +29,6 @@ type Props = {
 }
 
 const PAGE_SIZE = 6
-const SKELETON_COUNT = 3
 
 export default function HomeClient({ mosques, favouriteIds, userId, location, onLocate }: Props) {
   const [now, setNow] = useState(() => new Date())
@@ -290,9 +288,25 @@ export default function HomeClient({ mosques, favouriteIds, userId, location, on
             </div>
           )}
 
-          {/* Skeletons while first page loads */}
-          {initialLoading && Array.from({ length: SKELETON_COUNT }).map((_, i) => (
-            <MosqueCardSkeleton key={i} />
+          {/* SSR fallback: server-fetched mosques while first API page loads.
+              Crawlers see real content; users see cards immediately, then re-sort on location. */}
+          {initialLoading && applyAmenityFilters(
+            mosques
+              .filter((m) => !favSet.has(m.id))
+              .map(enrich)
+              .filter((m) => !selectedPrayer || m.nextJamaat !== null)
+          ).slice(0, PAGE_SIZE).map((m) => (
+            <MosqueCard
+              key={m.id}
+              name={m.name}
+              slug={m.slug}
+              lat={m.lat}
+              lng={m.lng}
+              distance={m.distance}
+              nextJamaat={m.nextJamaat}
+              isFavourited={false}
+              activeFilters={activeFilterCount > 0 ? amenityFilters : undefined}
+            />
           ))}
 
           {/* Loaded cards */}
