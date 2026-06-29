@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { getMosquesWithPrayerTimes, getFavouriteIds } from '@/lib/db/queries'
 import HomeShell from '@/components/HomeShell'
 import { auth } from '@/auth'
@@ -35,6 +36,14 @@ export default async function HomePage() {
         userName={session?.user?.name ?? null}
         userImage={session?.user?.image ?? null}
       />
+      <footer className="px-4 pb-8 pt-2 text-center">
+        <Link
+          href="/areas/tower-hamlets"
+          className="text-[13px] font-medium text-text-tertiary transition-colors duration-[200ms] ease-out hover:text-text-secondary"
+        >
+          Browse all Tower Hamlets mosques →
+        </Link>
+      </footer>
     </main>
   )
 }
