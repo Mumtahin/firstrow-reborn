@@ -2,3 +2,5 @@ User-agent: *
 Disallow: /api/
 Disallow: /sign-in
 Disallow: /favourites
+
+Sitemap: https://firstrow.uk/sitemap.xml
