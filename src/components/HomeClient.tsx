@@ -13,6 +13,7 @@ import {
 import type { Prayer, EnrichedMosque } from '@/lib/utils/prayerPills'
 import type { ClientLocation } from './HomeShell'
 import MosqueCard from './MosqueCard'
+import MosqueCardSkeleton from './MosqueCardSkeleton'
 import FilterSheet from './FilterSheet'
 import type { AmenityFilters } from './FilterSheet'
 import StarIcon from './icons/StarIcon'
@@ -325,7 +326,7 @@ export default function HomeClient({ mosques, favouriteIds, userId, location, on
           ))}
 
           {/* Skeletons while next page loads */}
-          {loadingMore && Array.from({ length: SKELETON_COUNT }).map((_, i) => (
+          {loadingMore && Array.from({ length: 3 }).map((_, i) => (
             <MosqueCardSkeleton key={`more-${i}`} />
           ))}
 
