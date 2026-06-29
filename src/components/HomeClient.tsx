@@ -273,6 +273,7 @@ export default function HomeClient({ mosques, favouriteIds, userId, location, on
                 distance={m.distance}
                 nextJamaat={m.nextJamaat}
                 isFavourited={true}
+                activeFilters={activeFilterCount > 0 ? amenityFilters : undefined}
               />
             ))}
           </div>
@@ -305,6 +306,7 @@ export default function HomeClient({ mosques, favouriteIds, userId, location, on
               distance={m.distance}
               nextJamaat={m.nextJamaat}
               isFavourited={false}
+              activeFilters={activeFilterCount > 0 ? amenityFilters : undefined}
             />
           ))}
 
