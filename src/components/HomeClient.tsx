@@ -3,9 +3,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { haversineDistance } from '@/lib/utils/distance'
-import { getNextJamaat, parseTime, toUKMinutes } from '@/lib/utils/getNextJamaat'
-import type { Prayer, NextJamaatResult } from '@/lib/utils/getNextJamaat'
+import { getNextJamaat } from '@/lib/utils/getNextJamaat'
 import type { MosqueWithTimes } from '@/lib/db/queries'
+import {
+  PRAYER_PILLS,
+  getPillLabel,
+  getSpecificPrayerJamaat,
+} from '@/lib/utils/prayerPills'
+import type { Prayer, EnrichedMosque } from '@/lib/utils/prayerPills'
 import type { ClientLocation } from './HomeShell'
 import MosqueCard from './MosqueCard'
 import MosqueCardSkeleton from './MosqueCardSkeleton'
@@ -15,42 +20,6 @@ import StarIcon from './icons/StarIcon'
 import MapPinIcon from './icons/MapPinIcon'
 
 const MosqueMap = dynamic(() => import('./MosqueMap'), { ssr: false })
-
-const PRAYER_PILLS: { key: Prayer; label: string }[] = [
-  { key: 'fajr', label: 'Fajr' },
-  { key: 'zuhr', label: 'Zuhr' },
-  { key: 'asr', label: 'Asr' },
-  { key: 'maghrib', label: 'Maghrib' },
-  { key: 'isha', label: 'Isha' },
-]
-
-function getPillLabel(key: Prayer, label: string): string {
-  if (key === 'zuhr' && new Date().getDay() === 5) return 'Jummah'
-  return label
-}
-
-function getSpecificPrayerJamaat(
-  mosque: MosqueWithTimes,
-  prayer: Prayer,
-  now: Date
-): NextJamaatResult | null {
-  const jamaat = mosque[`${prayer}Jamaat` as keyof MosqueWithTimes] as string | null
-  if (!jamaat) return null
-  const currentMinutes = toUKMinutes(now)
-  const jamaatMinutes = parseTime(jamaat)
-  if (jamaatMinutes >= currentMinutes) {
-    return { prayer, time: jamaat, isNextDay: false, minutesUntil: jamaatMinutes - currentMinutes }
-  }
-  if (currentMinutes - jamaatMinutes <= 10) {
-    return { prayer, time: jamaat, isNextDay: false, minutesUntil: 0, justStarted: true }
-  }
-  return null
-}
-
-type EnrichedMosque = MosqueWithTimes & {
-  distance: number | null
-  nextJamaat: NextJamaatResult | null
-}
 
 type Props = {
   mosques: MosqueWithTimes[]
