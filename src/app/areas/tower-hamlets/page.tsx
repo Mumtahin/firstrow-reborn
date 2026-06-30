@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getMosquesByDistricts } from '@/lib/db/queries'
 import type { MosqueListing } from '@/lib/db/queries'
+import { buildAreaJsonLd } from '@/lib/utils/mosque-jsonld'
 
 export const metadata: Metadata = {
   title: { absolute: 'Mosque Jamaat Times in Tower Hamlets | FirstRow' },
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
 
 // Postcode districts that cover Tower Hamlets
 const TOWER_HAMLETS_DISTRICTS = ['E1', 'E1W', 'E2', 'E3', 'E14']
+
 
 function MosqueListCard({ mosque }: { mosque: MosqueListing }) {
   return (
@@ -50,8 +52,19 @@ export default async function TowerHamletsPage() {
   }
   const towns = Object.keys(byTown).sort()
 
+  const jsonLd = buildAreaJsonLd(
+    'Tower Hamlets',
+    'https://firstrow.uk/areas/tower-hamlets',
+    'Live jamaat times for every mosque in Tower Hamlets, East London.',
+    mosques,
+  )
+
   return (
     <main className="mx-auto w-full max-w-lg">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="flex flex-col gap-6 px-4 pb-10 pt-10">
 
         {/* Nav */}

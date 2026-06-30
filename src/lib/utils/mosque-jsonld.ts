@@ -1,4 +1,4 @@
-import type { MosqueDetail } from '@/lib/db/queries'
+import type { MosqueDetail, MosqueListing } from '@/lib/db/queries'
 
 export function buildMosqueJsonLd(mosque: MosqueDetail, date: string) {
   const address: Record<string, string> = {
@@ -55,4 +55,31 @@ export function buildMosqueJsonLd(mosque: MosqueDetail, date: string) {
   }
 
   return jsonLd
+}
+
+export function buildAreaJsonLd(areaName: string, areaUrl: string, description: string, mosques: MosqueListing[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: `Mosques in ${areaName}`,
+    description,
+    url: areaUrl,
+    numberOfItems: mosques.length,
+    itemListElement: mosques.map((m, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      item: {
+        '@type': 'MosqueOrChurch',
+        name: m.name,
+        url: `https://firstrow.uk/mosque/${m.slug}`,
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: m.addressLine1,
+          addressLocality: m.town,
+          postalCode: m.postcode,
+          addressCountry: 'GB',
+        },
+      },
+    })),
+  }
 }
