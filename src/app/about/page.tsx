@@ -5,6 +5,8 @@ import ChevronLeftIcon from '@/components/icons/ChevronLeftIcon'
 
 export const metadata: Metadata = {
   title: 'About',
+  description:
+    'How FirstRow finds and verifies mosque jamaat times across Tower Hamlets and East London — sources, coverage, and how to report mistakes.',
 }
 
 export default function AboutPage() {
